@@ -8695,7 +8695,9 @@ ROMStart    EQU  $4000  ; absolute address to place my code/constant data
  ; Insert here your data definition.
 Counter     DS.W 1
 FiboRes     DS.W 1
-WORD FCB $4D,$65,$6D,$6F,$72,$79,$0A,$0D,$00
+
+WORD FCB "Memory"
+SPECIAL_CHARS FCB $0A,$0D,$00
 READ RMB 80
 
 ; code section
@@ -8724,8 +8726,8 @@ _Startup:
             CLI                     ; enable interrupts
 mainLoop: 
 
-  ;bsr task1
-  bsr task2
+  bsr task1
+  ;bsr task2
     
 
 task1: LDX #WORD    ; loads word pointer into X register

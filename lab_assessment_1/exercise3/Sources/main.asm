@@ -29,7 +29,9 @@ ROMStart    EQU  $4000  ; absolute address to place my code/constant data
  ; Insert here your data definition.
 Counter     DS.W 1
 FiboRes     DS.W 1
-WORD FCB $4D,$65,$6D,$6F,$72,$79,$0A,$0D,$00
+
+WORD FCB "Memory"
+SPECIAL_CHARS FCB $A,$D,$0
 READ RMB 80
 
 ; code section
@@ -59,8 +61,8 @@ _Startup:
             CLI                     ; enable interrupts
 mainLoop: 
 
-  ;bsr task1
-  bsr task2
+  bsr task1
+  ;bsr task2
     
 
 task1: LDX #WORD    ; loads word pointer into X register
@@ -69,9 +71,9 @@ task1: LDX #WORD    ; loads word pointer into X register
     
     
     task1_LOOP:
-    LDAA 1,X+     ; loads value at X into accumulator A & increment
-    CMPA #$00      ; comparing value in A to 0 
-    BEQ delay      ; branch if 0 is reached (null character)
+    LDAA 1,X+                         ; loads value at X into accumulator A & increment
+    CMPA #$00                         ; comparing value in A to 0 
+    BEQ delay                         ; branch if 0 is reached (null character)
     
     bsr loadSCI1
     bra task1_LOOP
@@ -84,33 +86,33 @@ task2: LDX #READ
 relay: LDX #READ
 
 relay_LOOP:
-    LDAA 1,X+     ; loads value at X into accumulator A & increment
-    CMPA #$00      ; comparing value in A to 0 
-    BEQ delay      ; branch if 0 is reached (null character)
+    LDAA 1,X+                         ; loads value at X into accumulator A & increment
+    CMPA #$00                         ; comparing value in A to 0 
+    BEQ delay                         ; branch if 0 is reached (null character)
     
     bsr loadSCI1
     bra relay_LOOP
 
 loadSCI1:
-    MOVB #$00, SCI1BDH
-    MOVB #156, SCI1BDL
-    MOVB #$00, SCI1CR1
+    MOVB #$00, SCI1BDH                ; set baud rate to 9600
+    MOVB #156, SCI1BDL               
+    MOVB #$00, SCI1CR1                ; set control register values
     MOVB #$08, SCI1CR2
-    brclr SCI1SR1,mSCI1SR1_TDRE,*    ; waits for TDRE to be set
-    staa SCI1DRL           ; outputs the character
+    brclr SCI1SR1,mSCI1SR1_TDRE,*     ; waits for TDRE to be set
+    staa SCI1DRL                      ; loads character from A register to data register
     rts
     
     
 
 readSCI1: 
-    MOVB #00, SCI1BDH
+    MOVB #00, SCI1BDH                 ; set baud rate to 9600
     MOVB #156, SCI1BDL
-    MOVB #mSCI1CR2_RE, SCI1CR2
-    brclr SCI1SR1, mSCI1SR1_RDRF,*
-    LDAA SCI1DRL
-    STAA 1,X+
-    CMPA #$D
-    BEQ complete_string
+    MOVB #mSCI1CR2_RE, SCI1CR2        ; set control register to read incoming signals
+    brclr SCI1SR1, mSCI1SR1_RDRF,*    ; poll RDRF register
+    LDAA SCI1DRL                      ; load value from data register to A register
+    STAA 1,X+                         ; store value from A to X index 
+    CMPA #$D                          ; check if character in A register is the return character
+    BEQ complete_string               ; branch to complete_string subroutine if return character encountered
     bra readSCI1
     
 complete_string:
