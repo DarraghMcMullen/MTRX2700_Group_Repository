@@ -36,31 +36,56 @@ _Startup:
             LDS   #RAMEnd+1       ; initialize the stack pointer
 
             CLI                     ; enable interrupts
-mainLoop:
-            LDX   #1              ; X contains counter
-couterLoop:
-            STX   Counter         ; update global.
-            BSR   CalcFibo
-            STD   FiboRes         ; store result
-            LDX   Counter
-            INX
-            CPX   #24             ; larger values cause overflow.
-            BNE   couterLoop
-            BRA   mainLoop        ; restart.
 
-CalcFibo:  ; Function to calculate fibonacci numbers. Argument is in X.
-            LDY   #$00            ; second last
-            LDD   #$01            ; last
-            DBEQ  X,FiboDone      ; loop once more (if X was 1, were done already)
-FiboLoop:
-            LEAY  D,Y             ; overwrite second last with new value
-            EXG   D,Y             ; exchange them -> order is correct again
-            DBNE  X,FiboLoop
-FiboDone:
-            RTS                   ; result in D
+
+7SEG0 equ $3F ;0
+7SEG1 equ $06 ;1
+7SEG2 equ $5B ;2
+7SEG3 equ $4F ;3
+7SEG4 equ $66 ;4
+7SEG5 equ $6D ;5
+7SEG6 equ $7D ;6
+7SEG7 equ $07 ;7
+7SEG8 equ $7F ;8
+7SEG9 equ $67 ;9
+
+DISP1 equ %00001110 ;7 seg display 1
+DISP2 equ %00001101 ;7 seg display 2
+DISP3 equ %00001011 ;7 seg display 3
+DISP4 equ %00000111 ;7 seg display 4
+
+
+      ldaa #$FF
+      staa DDRB ;portB as output
+      staa DDRP ;portP as output
+      
+  
+START:
+      ldaa #7SEG4
+      staa PORTB  ;send to port B
+      ldaa #DISP1 ;select digit 0
+      staa PTP
+      
+      ldaa #7SEG3
+      staa PORTB
+      ldaa #DISP2
+      staa PTP
+      
+      ldaa #7SEG2
+      staa PORTB
+      ldaa #DISP3
+      staa PTP
+      
+      ldaa #7SEG1
+      staa PORTB
+      ldaa #DISP4
+      staa PTP
+      
+           
 
 ;**************************************************************
 ;*                 Interrupt Vectors                          *
 ;**************************************************************
             ORG   $FFFE
             DC.W  Entry           ; Reset Vector
+
