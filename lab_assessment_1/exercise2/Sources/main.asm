@@ -56,8 +56,11 @@ DISP4 equ %00000111 ;7 seg display 4
 
 
       ldaa #$FF
+      staa DDRJ ;portJ as output
       staa DDRB ;portB as output
       staa DDRP ;portP as output
+      ldaa #$00
+      staa PTJ  ;portJ as output
       
   
 START:
