@@ -69,38 +69,52 @@ start:
       ldaa #DISP1 ;select digit 0
       staa PTP
       
-      bsr delay
+      bsr delay1ms
       
       ldaa #SSEG3
       staa PORTB
       ldaa #DISP2
       staa PTP
       
-      bsr delay
+      bsr delay1ms
       
       ldaa #SSEG2
       staa PORTB
       ldaa #DISP3
       staa PTP
       
-      bsr delay
+      bsr delay1ms
       
       ldaa #SSEG1
       staa PORTB
       ldaa #DISP4
       staa PTP
      
+      bsr delay1ms
+     
       bra start
       
       
-delay:  
+delay1s:  
           LDX #60000
-          LOOP:
+          LOOPs:
           LDAA #100
-          LOP:
+          LOPs:
           NOP
-          DBNE A, LOP
-          DBNE X, LOOP
+          DBNE A, LOPs
+          DBNE X, LOOPs
+        
+          
+          rts		; return from subroutine
+          
+delay1ms:  
+          LDX #60
+          LOOPms:
+          LDAA #100
+          LOPms:
+          NOP
+          DBNE A, LOPms
+          DBNE X, LOOPms
         
           
           rts		; return from subroutine
