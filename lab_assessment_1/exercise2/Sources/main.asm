@@ -38,16 +38,16 @@ _Startup:
             CLI                     ; enable interrupts
 
 
-7SEG0 equ $3F ;0
-7SEG1 equ $06 ;1
-7SEG2 equ $5B ;2
-7SEG3 equ $4F ;3
-7SEG4 equ $66 ;4
-7SEG5 equ $6D ;5
-7SEG6 equ $7D ;6
-7SEG7 equ $07 ;7
-7SEG8 equ $7F ;8
-7SEG9 equ $67 ;9
+SSEG0 equ $3F ;0
+SSEG1 equ $06 ;1
+SSEG2 equ $5B ;2
+SSEG3 equ $4F ;3
+SSEG4 equ $66 ;4
+SSEG5 equ $6D ;5
+SSEG6 equ $7D ;6
+SSEG7 equ $07 ;7
+SSEG8 equ $7F ;8
+SSEG9 equ $67 ;9
 
 DISP1 equ %00001110 ;7 seg display 1
 DISP2 equ %00001101 ;7 seg display 2
@@ -56,30 +56,30 @@ DISP4 equ %00000111 ;7 seg display 4
 
 
       ldaa #$FF
-      staa DDRJ ;portJ as output
       staa DDRB ;portB as output
       staa DDRP ;portP as output
+      staa DDRJ ;portJ as output
       ldaa #$00
-      staa PTJ  ;portJ as output
+      staa PTJ  ;enable LEDs
       
   
 START:
-      ldaa #7SEG4
+      ldaa #SSEG4
       staa PORTB  ;send to port B
       ldaa #DISP1 ;select digit 0
       staa PTP
       
-      ldaa #7SEG3
+      ldaa #SSEG3
       staa PORTB
       ldaa #DISP2
       staa PTP
       
-      ldaa #7SEG2
+      ldaa #SSEG2
       staa PORTB
       ldaa #DISP3
       staa PTP
       
-      ldaa #7SEG1
+      ldaa #SSEG1
       staa PORTB
       ldaa #DISP4
       staa PTP
