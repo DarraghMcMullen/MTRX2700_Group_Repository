@@ -8730,28 +8730,47 @@ DISP4 equ %00000111 ;7 seg display 4
       staa PTJ  ;enable LEDs
       
   
-START:
+start:
       ldaa #SSEG4
       staa PORTB  ;send to port B
       ldaa #DISP1 ;select digit 0
       staa PTP
+      
+      bsr delay
       
       ldaa #SSEG3
       staa PORTB
       ldaa #DISP2
       staa PTP
       
+      bsr delay
+      
       ldaa #SSEG2
       staa PORTB
       ldaa #DISP3
       staa PTP
       
+      bsr delay
+      
       ldaa #SSEG1
       staa PORTB
       ldaa #DISP4
       staa PTP
+     
+      bra start
       
-           
+      
+delay:  
+          LDX #60000
+          LOOP:
+          LDAA #100
+          LOP:
+          NOP
+          DBNE A, LOP
+          DBNE X, LOOP
+        
+          
+          rts		; return from subroutine
 
 ;**************************************************************
 ;*                 Interrupt Vectors                          *
