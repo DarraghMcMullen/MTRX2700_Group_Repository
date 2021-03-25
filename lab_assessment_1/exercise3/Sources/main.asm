@@ -30,6 +30,7 @@ ROMStart    EQU  $4000  ; absolute address to place my code/constant data
 Counter     DS.W 1
 FiboRes     DS.W 1
 
+;---Reserved memory for input strings---
 WORD FCB "Memory"
 SPECIAL_CHARS FCB $A,$D,$0
 READ RMB 80
@@ -59,81 +60,72 @@ _Startup:
  endif
 
             CLI                     ; enable interrupts
+
+
+
 mainLoop: 
 
   bsr task1
   ;bsr task2
     
 
-task1: LDX #WORD    ; loads word pointer into X register
+task1: LDX #WORD                      ; loads word address into X register  
+    bsr send_str                      ; send string to serial data register
     
+
+task2: LDX #READ                      ; loads word address into X register
+    bsr readSCI1                      ; read string from serial data register
     
-    
-    
-    task1_LOOP:
+
+send_str:
     LDAA 1,X+                         ; loads value at X into accumulator A & increment
     CMPA #$00                         ; comparing value in A to 0 
-    BEQ delay                         ; branch if 0 is reached (null character)
+    BEQ delay_reset                   ; delay when null character is found (end of string)
     
-    bsr loadSCI1
-    bra task1_LOOP
-    
+    bsr loadSCI1                      ; load character to serial 1 data register
+    bra send_str                      ; return to beginning of subroutine
 
-task2: LDX #READ
-    
-    bsr readSCI1
-    
-relay: LDX #READ
 
-relay_LOOP:
-    LDAA 1,X+                         ; loads value at X into accumulator A & increment
-    CMPA #$00                         ; comparing value in A to 0 
-    BEQ delay                         ; branch if 0 is reached (null character)
-    
-    bsr loadSCI1
-    bra relay_LOOP
-
+; -- Loads Character in A register to Serial 1 Data Register --
 loadSCI1:
-    MOVB #$00, SCI1BDH                ; set baud rate to 9600
-    MOVB #156, SCI1BDL               
-    MOVB #$00, SCI1CR1                ; set control register values
-    MOVB #$08, SCI1CR2
+                
+    MOVB #156, SCI1BDL                ; set baud rate to 9600       
+    MOVB #$08, SCI1CR2                ; set control register values
     brclr SCI1SR1,mSCI1SR1_TDRE,*     ; waits for TDRE to be set
     staa SCI1DRL                      ; loads character from A register to data register
     rts
     
     
-
-readSCI1: 
-    MOVB #00, SCI1BDH                 ; set baud rate to 9600
-    MOVB #156, SCI1BDL
+; -- Read incoming characters from Serial 1 Data Register, loop until return character encountered -- 
+readSCI1:                 
+    MOVB #156, SCI1BDL                ; set baud rate to 9600
     MOVB #mSCI1CR2_RE, SCI1CR2        ; set control register to read incoming signals
     brclr SCI1SR1, mSCI1SR1_RDRF,*    ; poll RDRF register
     LDAA SCI1DRL                      ; load value from data register to A register
     STAA 1,X+                         ; store value from A to X index 
     CMPA #$D                          ; check if character in A register is the return character
     BEQ complete_string               ; branch to complete_string subroutine if return character encountered
-    bra readSCI1
-    
-complete_string:
-    LDAA #$A    
-    STAA 1,X+
-    LDAA #00
-    STAA 1,X+
-    bra relay
+    bra readSCI1                      ; otherwise, continue looping
 
-delay:
-   
-    LDX #60000
-LOOP1:
-    LDAA #100
-LOOP2:
-    NOP
-    DBNE A, LOOP2
-    DBNE X, LOOP1
-        
-          
-    bra mainLoop
+; -- Adds carriage return and null character to end of string at address pointed by X index --
+complete_string:
+    LDAA #$A                          ; load carriage return character to A register
+    STAA 1,X+                         ; store byte in A register to address pointed by X index
+    LDAA #00                          ; load null character to A register
+    STAA 1,X+                         ; store byte in A register to address pointed by X index
+    LDX #READ                         ; return X index to beginning of string
+    bra send_str                      ; send string to serial interface
+
+; Subroutine takes approx 1 second to complete using nested loops, returns to beginning of code after execution 
+delay_reset:   
+  LDX #60000                          ; load 60000 into X  
+  LOOP1:
+    LDY #100                          ; load 100 into Y
+    LOOP2:
+      DBNE Y, LOOP2                   ; decrement Y, branch to LOOP2 if not 0
+    DBNE X, LOOP1                     ; decremeny X, branch to LOOP1 if not 0
+               
+  bra mainLoop
 
 ;**************************************************************
 ;*                 Interrupt Vectors                          *
