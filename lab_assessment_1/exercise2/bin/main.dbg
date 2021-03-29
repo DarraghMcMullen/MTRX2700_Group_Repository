@@ -8707,7 +8707,7 @@ LOOPS:  ds.w 1
 BUTTON_PRESSED:   rmb  1
 
 ;boolean value to select auto scroll mode, or button scroll mode
-SCROLL_MODE: dc.w 0 ;1=auto, 0=button, button is still active in auto mode
+SCROLL_MODE: dc.w 1 ;1=auto, 0=button, button is still active in auto mode
 
 ; code section
   ORG   ROMStart

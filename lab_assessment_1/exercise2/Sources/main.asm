@@ -174,8 +174,8 @@ checkButton:
   
   ; debounce routine
   checkIfStillPressed:
-    ;delay for 20ms
-    ldy #20
+    ;delay for 100ms
+    ldy #100
     jsr delay1ms
     ldaa PTH
     anda #%00010000 ;mask all inputs but SW2
