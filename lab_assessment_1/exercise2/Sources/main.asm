@@ -25,7 +25,7 @@ STRING:   fcc  "test string 0123456789-"
 STRING_LEN: rmb 1
   
 ;memory allocation for currently displayed string (4 ASCII char)
-DISP_STRING:  fcc "8888"
+DISP_STRING:  fcc "1234"
   
 ;counter for current location in display sequence
 DISP_STRING_COUNTER:  rmb  1 
@@ -99,18 +99,21 @@ mPlex:
   
   mPlexLoop:
   
-    ;select display 
-    ldx #DISPLAY_INDEX_LUT
-    ldab DISP_STRING_COUNTER
-    ldaa b,x                     
-    staa PTP
-     
     ;disp character 
     ldx #DISP_STRING
     ldab DISP_STRING_COUNTER                 
     ldaa b,x
     bsr ASCIILUT
     staa PORTB
+    
+    ;select display 
+    ldx #DISPLAY_INDEX_LUT
+    ldab DISP_STRING_COUNTER
+    ldaa b,x                     
+    staa PTP
+    jsr delay1ms
+    ldaa #%00001111
+    staa PTP
 
     ;inc counter and loop
     ldaa DISP_STRING_COUNTER
@@ -165,12 +168,12 @@ checkButton:
 
   movb #0,BUTTON_PRESSED  ; initialise BUTTON_PRESSED to 0
   
-  ;11101111 on PTH for SW2 pressed
+  ;11110111 on PTH for SW2 pressed
   captureInitialPress:
     ldaa PTH
     anda #%00010000 ;mask all inputs but SW2
     cmpa #%00010000 ;z=1 if not pressed, z=0 if pressed
-    bne exit        ;if not pressed, exit
+    beq exit        ;if not pressed, exit
   
   ; debounce routine
   checkIfStillPressed:
@@ -180,7 +183,7 @@ checkButton:
     ldaa PTH
     anda #%00010000 ;mask all inputs but SW2
     cmpa #%00010000 ;z=1 if not pressed, z=0 if pressed
-    bne exit ;if not still pressed after 20ms, exit
+    beq exit ;if not still pressed after 20ms, exit
   
    ; if pressed, rotate string and set register = true
    movb #1, BUTTON_PRESSED  ;set button pressed register = 1 if pressed
