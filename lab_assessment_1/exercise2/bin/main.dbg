@@ -8707,7 +8707,7 @@ LOOPS:  ds.w 1
 BUTTON_PRESSED:   rmb  1
 
 ;boolean value to select auto scroll mode, or button scroll mode
-SCROLL_MODE: dc.w 1 ;1=auto, 0=button, button is still active in auto mode
+SCROLL_MODE: dc.w 0 ;1=auto, 0=button, button is still active in auto mode
 
 ; code section
   ORG   ROMStart
@@ -8837,17 +8837,17 @@ checkButton:
     ldaa PTH
     anda #%00010000 ;mask all inputs but SW2
     cmpa #%00010000 ;z=1 if not pressed, z=0 if pressed
-    beq exit        ;if not pressed, exit
+    bne exit        ;if not pressed, exit
   
   ; debounce routine
   checkIfStillPressed:
-    ;delay for 20ms
-    ldy #20
+    ;delay for 100ms
+    ldy #100
     jsr delay1ms
     ldaa PTH
     anda #%00010000 ;mask all inputs but SW2
     cmpa #%00010000 ;z=1 if not pressed, z=0 if pressed
-    beq exit ;if not still pressed after 20ms, exit
+    bne exit ;if not still pressed after 20ms, exit
   
    ; if pressed, rotate string and set register = true
    movb #1, BUTTON_PRESSED  ;set button pressed register = 1 if pressed

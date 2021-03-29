@@ -170,7 +170,7 @@ checkButton:
     ldaa PTH
     anda #%00010000 ;mask all inputs but SW2
     cmpa #%00010000 ;z=1 if not pressed, z=0 if pressed
-    beq exit        ;if not pressed, exit
+    bne exit        ;if not pressed, exit
   
   ; debounce routine
   checkIfStillPressed:
@@ -180,7 +180,7 @@ checkButton:
     ldaa PTH
     anda #%00010000 ;mask all inputs but SW2
     cmpa #%00010000 ;z=1 if not pressed, z=0 if pressed
-    beq exit ;if not still pressed after 20ms, exit
+    bne exit ;if not still pressed after 20ms, exit
   
    ; if pressed, rotate string and set register = true
    movb #1, BUTTON_PRESSED  ;set button pressed register = 1 if pressed
