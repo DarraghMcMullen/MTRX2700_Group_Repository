@@ -19,8 +19,8 @@ ASCII_SSEG_LUT:    dc.b   %00000000,%00000110,%01000010,%10101101,%11101101,%101
 DISPLAY_INDEX_LUT:    dc.b   %00001110,%00001101,%00001011,%00000111
 
 ;memory allocation for string
-STRING:   fcc  "test string 0123456789-"
-;STRING:   fcc   "1234"
+;STRING:   fcc  "test string 0123456789-"
+STRING:   fcc   "1234"
 
 ;length of string
 STRING_LEN: rmb 1
@@ -41,7 +41,10 @@ LOOPS:  ds.w 1
 BUTTON_PRESSED:   rmb  1
 
 ;boolean value to select auto scroll mode, or button scroll mode
-SCROLL_MODE: dc.w 1 ;1=auto, 0=button, button is still active in auto mode
+SCROLL_MODE: dc.w 0 ;1=auto, 0=button, button is still active in auto mode
+
+;number of displays to use in multiplex routine (max = 4)
+N_DISPS: dc.b 1    ;default = 4
 
 ; code section
   ORG   ROMStart
@@ -62,9 +65,12 @@ Entry:
 
 ; init. string counter and string length
   movb #0, STRING_COUNTER
-  movb #22, STRING_LEN
-  ;movb #4, STRING_LEN
+  ;movb #22, STRING_LEN
+  movb #4, STRING_LEN
   ;movb #7, STRING_LEN
+  
+  
+  
   
 ; main loop  
 main:
@@ -83,16 +89,40 @@ main:
   
   bra main  ;loop forever
         
+        
+        
+        
+        
+; check if SW2 is pressed, if so, rotate string and set BUTTON_PRESSED = 1          
+checkButton:
 
-; convert ASCII code to LUT index      
-ASCIILUT:
-
-  suba #$20
-  ldx #ASCII_SSEG_LUT
-  tab
-  ldaa b,x
+  movb #0,BUTTON_PRESSED  ; initialise BUTTON_PRESSED to 0
   
-  rts
+  ;11110111 on PTH for SW2 pressed
+  captureInitialPress:
+    ldaa PTH
+    anda #$08 ;mask all inputs but SW2
+    cmpa #$08 ;z=1 if not pressed, z=0 if pressed
+    beq exit        ;if not pressed, exit
+  
+   ;debounce routine
+  checkIfStillPressed:
+    ;delay for 100ms
+    ldy #100
+    jsr delay1ms
+    ldaa PTH
+    anda #%00010000 ;mask all inputs but SW2
+    cmpa #%00010000 ;z=1 if not pressed, z=0 if pressed
+    beq exit ;if not still pressed after 20ms, exit
+  
+   ; if pressed, rotate string and set register = true
+   movb #1, BUTTON_PRESSED  ;set button pressed register = 1 if pressed
+   bsr rotateString
+  
+  exit:
+    rts
+    
+
      
 
 ; multiplex displays to write currently displayed string to displays      
@@ -123,11 +153,23 @@ mPlex:
     ldaa DISP_STRING_COUNTER
     inca
     staa DISP_STRING_COUNTER
-    suba #4
+    suba N_DISPS
     bne mPlexLoop
      
     rts
+    
+    
+ ; convert ASCII code to LUT index      
+ASCIILUT:
 
+  suba #$20
+  ldx #ASCII_SSEG_LUT
+  tab
+  ldaa b,x
+  
+  rts
+  
+  
 
 ;rotate currently displayed string left, adding next character from string to right     
 rotateString:
@@ -158,6 +200,8 @@ rotateString:
 
   rts
   
+  
+  
 ; resets string counter to 0
 resetStringCounter:
 
@@ -165,37 +209,9 @@ resetStringCounter:
   staa STRING_COUNTER
   
   rts
-
-
-; check if SW2 is pressed, if so, rotate string and set BUTTON_PRESSED = 1          
-checkButton:
-
-  movb #0,BUTTON_PRESSED  ; initialise BUTTON_PRESSED to 0
-  
-  ;11110111 on PTH for SW2 pressed
-  captureInitialPress:
-    ldaa PTH
-    anda #$08 ;mask all inputs but SW2
-    cmpa #$08 ;z=1 if not pressed, z=0 if pressed
-    beq exit        ;if not pressed, exit
-  
-   ;debounce routine
-  checkIfStillPressed:
-    ;delay for 100ms
-    ldy #100
-    jsr delay1ms
-    ldaa PTH
-    anda #%00010000 ;mask all inputs but SW2
-    cmpa #%00010000 ;z=1 if not pressed, z=0 if pressed
-    beq exit ;if not still pressed after 20ms, exit
-  
-   ; if pressed, rotate string and set register = true
-   movb #1, BUTTON_PRESSED  ;set button pressed register = 1 if pressed
-   bsr rotateString
-  
-  exit:
-    rts
       
+
+
 
 ;delay by 1ms * number in y register      
 delay1ms:
@@ -221,6 +237,9 @@ delay1ms:
   pulx
   
   rts        
+    
+    
+    
           
 sml_delay:
 
@@ -230,6 +249,10 @@ sml_delay:
   
   rts                
          
+
+
+
+
 
 ;**************************************************************
 ;*                 Interrupt Vectors                          *
