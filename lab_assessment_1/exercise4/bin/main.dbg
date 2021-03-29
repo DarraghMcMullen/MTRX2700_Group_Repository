@@ -1,8 +1,21 @@
-; export symbols
-  XDEF Entry, _Startup            ; export 'Entry' symbol
-  ABSENTRY Entry        ; for absolute assembly: mark this as application entry point
+;*****************************************************************
+;* This stationery serves as the framework for a                 *
+;* user application (single file, absolute assembly application) *
+;* For a more comprehensive program that                         *
+;* demonstrates the more advanced functionality of this          *
+;* processor, please see the demonstration applications          *
+;* located in the examples subdirectory of the                   *
+;* Freescale CodeWarrior for the HC12 Program directory          *
+;*****************************************************************
 
-  INCLUDE 'derivative.inc' 
+; export symbols
+            XDEF Entry, _Startup            ; export 'Entry' symbol
+            ABSENTRY Entry        ; for absolute assembly: mark this as application entry point
+
+
+
+; Include derivative-specific definitions 
+		INCLUDE 'derivative.inc' 
 
  ; Note: This file is recreated by the project wizard whenever the MCU is
  ;       changed and should not be edited by hand
@@ -8675,232 +8688,184 @@ ROMStart    EQU  $4000  ; absolute address to place my code/constant data
 
 ; variable/data section
 
-  ORG RAMStart
+ ifdef _HCS12_SERIALMON
+            ORG $3FFF - (RAMEnd - RAMStart)
+ else
+ endif
+ ; Insert here your data definition.
+Counter     DS.W 1
+FiboRes     DS.W 1
 
-; Insert here your data definition.
- 
-;look-up table for ASCII from $20 to $7E
-ASCII_SSEG_LUT:    dc.b   %00000000,%00000110,%01000010,%10101101,%11101101,%10101101,%10101101,%00000010,%00111001,%00001111,%11100011,%11000110,%00000100,%01000000,%10000000,%00000110,%00111111,%00000110,%01011011,%01001111,%01100110,%01101101,%01111101,%00000111,%01111111,%01100111,%10000110,%10000110,%01000110,%01001000,%01110000,%11101101,%01011111,%01110111,%01111100,%01111001,%01011110,%01111001,%01110001,%01101111,%01110100,%00110000,%00011110,%01110101,%00111000,%01011101,%01010100,%01011100,%01110011,%01100111,%01010000,%01101101,%01111000,%00111110,%00011100,%01101010,%01110111,%01101110,%01011011,%00111001,%00000110,%00001111,%00100011,%00001000,%10001000,%01110111,%01111100,%01111001,%01011110,%01111001,%01110001,%01101111,	%01110100,%00110000,%00011110,%01110101,%00111000,%01011101,%01010100,%01011100,%01110011,%01100111,%01010000,%01101101,%01111000,%00111110,%00011100,%01101010,%01110111,%01101110,%01011011,%00111001,%00000110,%00001111,%11000000
+;---Reserved memory for input strings---
+NUL EQU $0
+LF EQU $A
+CR EQU $D
 
-;lut for display masks from 1 to 4 (left to right)
-DISPLAY_INDEX_LUT:    dc.b   %00001110,%00001101,%00001011,%00000111
 
-;memory allocation for string
-STRING:   fcc  "test string 0123456789-"
-;STRING:   fcc   "1234"
-
-;length of string
-STRING_LEN: rmb 1
-  
-;memory allocation for currently displayed string (4 ASCII char)
-DISP_STRING:  fcc "1234"
-  
-;counter for current location in display sequence
-DISP_STRING_COUNTER:  rmb  1 
-  
-;coutner for current location in string
-STRING_COUNTER:   rmb  1
-
-;counter for number of loops before rotating string
-LOOPS:  ds.w 1
-  
-;boolean value for input detection
-BUTTON_PRESSED:   rmb  1
-
-;boolean value to select auto scroll mode, or button scroll mode
-SCROLL_MODE: dc.w 1 ;1=auto, 0=button, button is still active in auto mode
+TASKFLAG FCB 0
+SPACEFLAG FCB 0
+READ RMB 80
+WRITE RMB 80
 
 ; code section
-  ORG   ROMStart
+            ORG   ROMStart
+
 
 Entry:
+_Startup:
+            ; remap the RAM &amp; EEPROM here. See EB386.pdf
+ ifdef _HCS12_SERIALMON
+            ; set registers at $0000
+            CLR   $11                  ; INITRG= $0
+            ; set ram to end at $3FFF
+            LDAB  #$39
+            STAB  $10                  ; INITRM= $39
 
-  _Startup:
-    LDS   #RAMEnd+1       ; initialize the stack pointer
-    CLI                   ; enable interrupts
-      
-      
-;port setup
-  movb #$FF, DDRB ;portB as output
-  movb #$FF, DDRP ;portP as output
-  movb #$FF, DDRJ ;portJ as output
-  movb #$00, DDRH ;portH as input
-  movb #$00, PTJ  ;enable LEDs
+            ; set eeprom to end at $0FFF
+            LDAA  #$9
+            STAA  $12                  ; INITEE= $9
 
-; init. string counter and string length
-  movb #0, STRING_COUNTER
-  movb #22, STRING_LEN
-  ;movb #4, STRING_LEN
-  ;movb #7, STRING_LEN
-  
-; main loop  
-main:
-  bsr checkButton ;check if SW2 is pressed (with debounce)
-     
-  bsr mPlex ;multiplex displays to write 4 character display string to displays
-  
-  ; autoscroll counter routine
-  ldd LOOPS
-  addd SCROLL_MODE ;if autoscroll enabled, loop will inc., else, loop will remain 0
-  std LOOPS
-  subd #60
-  bne main
-  
-  bsr rotateString  ;rotate currently displayed string left, adding next character from string to right
-  
-  bra main  ;loop forever
-        
 
-; convert ASCII code to LUT index      
-ASCIILUT:
+            LDS   #$3FFF+1        ; See EB386.pdf, initialize the stack pointer
+ else
+ endif
 
-  suba #$20
-  ldx #ASCII_SSEG_LUT
-  tab
-  ldaa b,x
-  
-  rts
-     
+            CLI                     ; enable interrupts
 
-; multiplex displays to write currently displayed string to displays      
-mPlex:
 
-  movb #0, DISP_STRING_COUNTER ;set counter
+
+mainLoop: 
   
-  mPlexLoop:
-  
-    ;disp character 
-    ldx #DISP_STRING
-    ldab DISP_STRING_COUNTER                 
-    ldaa b,x
-    bsr ASCIILUT
-    staa PORTB
-    
-    ;select display 
-    ldx #DISPLAY_INDEX_LUT
-    ldab DISP_STRING_COUNTER
-    ldaa b,x                     
-    staa PTP
-    jsr sml_delay
-    ldaa #%00001111
-    staa PTP
+  MOVB #156, SCI1BDL                  ; set baud rate to 9600
+  LDX #READ                      ; loads word address into X register
+                         
+  bsr readSCI1                      ; read string from serial data register
     
 
-    ;inc counter and loop
-    ldaa DISP_STRING_COUNTER
-    inca
-    staa DISP_STRING_COUNTER
-    suba #4
-    bne mPlexLoop
-     
+send_str:
+    LDAA 1,X+                         ; loads value at X into accumulator A & increment
+    BEQ mainLoop                      ; delay when null character is found (end of string)
+    
+    bsr loadSCI1                      ; load character to serial 1 data register
+    bra send_str                      ; return to beginning of subroutine
+
+
+; -- Loads Character in A register to Serial 1 Data Register --
+loadSCI1:                
+    MOVB #mSCI1CR2_TE, SCI1CR2        ; set control register to transmit data
+    brclr SCI1SR1,mSCI1SR1_TDRE,*     ; waits for TDRE to be set
+    staa SCI1DRL                      ; loads character from A register to data register
     rts
+    
+    
+; -- Read incoming characters from Serial 1 Data Register, loop until return character encountered -- 
+readSCI1:                 
+    MOVB #mSCI1CR2_RE, SCI1CR2        ; set control register to receive data
+    brclr SCI1SR1, mSCI1SR1_RDRF,*    ; poll RDRF register
+    LDAA SCI1DRL                      ; load value from data register to A register
+    STAA 1,X+                         ; store value from A to X index 
+    CMPA #CR                          ; check if character in A register is the return character
+    BEQ complete_string               ; branch to complete_string subroutine if return character encountered
+    bra readSCI1                      ; otherwise, continue looping
+
+; -- Adds carriage return and null character to end of string at address pointed by X index --
+complete_string:
+    LDAA #LF                          ; load carriage return character to A register
+    STAA 1,X+                         ; store byte in A register to address pointed by X index
+    LDAA #NUL                         ; load null character to A register
+    STAA 1,X+                         ; store byte in A register to address pointed by X index
+    LDX #READ                         ; return X index to beginning of string
+    bra task_number                   ; send string to serial interface
+
+; Subroutine takes approx 1 second to complete using nested loops, returns to beginning of code after execution 
+delay_reset:   
+  LDX #60000                          ; load 60000 into X  
+  LOOP1:
+    LDY #100                          ; load 100 into Y
+    LOOP2:
+      DBNE Y, LOOP2                   ; decrement Y, branch to LOOP2 if not 0
+    DBNE X, LOOP1                     ; decremeny X, branch to LOOP1 if not 0
+               
+  bra mainLoop
 
 
-;rotate currently displayed string left, adding next character from string to right     
-rotateString:
-
-  ; rotate current string left
-  ldx #DISP_STRING
-  ldaa 1,x
-  staa 0,x
-  ldaa 2,x
-  staa 1,x
-  ldaa 3,x
-  staa 2,x
-
-  ; add next character in string to end of display string
-  ldx #STRING
-  ldab STRING_COUNTER
-  ldaa b,x
-  ldx #DISP_STRING
-  staa 3,x
+task_number:                          
+  MOVB #$0,DDRH                       ; set port H data direction register to input
+  LDAB PTH                            ; store value of port H in B register
+  LDX #TASKFLAG
+  STAB 0,X
+  LDX #READ
+  LDY #WRITE
+  LDAB 0
   
-  ; reset string counter at end of string 
-  ldab STRING_COUNTER
-  incb
-  stab STRING_COUNTER
-  ldaa STRING_LEN
-  sba
-  beq resetStringCounter
-
-  rts
+change_str:
   
-; resets string counter to 0
-resetStringCounter:
-
-  ldaa #0
-  staa STRING_COUNTER
+  LDAA TASKFLAG
   
-  rts
-
-
-; check if SW2 is pressed, if so, rotate string and set BUTTON_PRESSED = 1          
-checkButton:
-
-  movb #0,BUTTON_PRESSED  ; initialise BUTTON_PRESSED to 0
+  CMPA #$1
+  BEQ space_upper_loop
+  BNE all_upper_loop
   
-  ;11110111 on PTH for SW2 pressed
-  captureInitialPress:
-    ldaa PTH
-    anda #$08 ;mask all inputs but SW2
-    cmpa #$08 ;z=1 if not pressed, z=0 if pressed
-    beq exit        ;if not pressed, exit
+  all_upper_loop:
+      LDAA 1,X+
+      CMPA #$0D
+      BEQ finish
+      CMPA #$61
+      BGE make_upper
+      BLO next
   
-   ;debounce routine
-  checkIfStillPressed:
-    ;delay for 100ms
-    ldy #100
-    jsr delay1ms
-    ldaa PTH
-    anda #%00010000 ;mask all inputs but SW2
-    cmpa #%00010000 ;z=1 if not pressed, z=0 if pressed
-    beq exit ;if not still pressed after 20ms, exit
+  space_upper_loop:
+      LDAA 1,X+
+      CMPA #$0D
+      BEQ finish
+      CMPA #$20
+      BEQ space
+      CMPB #$0
+      BEQ before_space
+      BNE after_space   
   
-   ; if pressed, rotate string and set register = true
-   movb #1, BUTTON_PRESSED  ;set button pressed register = 1 if pressed
-   bsr rotateString
+  before_space:    
+      CMPA #$61
+      BLO make_lower
+      BGE next
   
-  exit:
-    rts
+  after_space:
+      LDAB #0
+      CMPA #$61
+      BGE make_upper
+      BLO next
+ 
+  space:
+      LDAB #1
+      bra next
       
-
-;delay by 1ms * number in y register      
-delay1ms:
-  pshx
-  LDY #100
-  outerLoop: 
-    ldx #1000
-    innerLoop: 
-      psha ; 2 cycles
-      pula ; 3 cycles
-      psha ; 2 cycles
-      pula ; 3 cycles
-      psha ; 2 cycles
-      pula ; 3 cycles
-      psha ; 2 cycles
-      pula ; 3 cycles
-      nop ; 1 cycle
-      nop ; 1 cycle
-      nop ; 1 cycle
-      nop ; 1 cycle
-    dbne x,innerLoop
-  dbne y,outerLoop
-  pulx
+  next:  
+    STAA  1,Y+                        ;store into output
+    bra change_str
   
-  rts        
-          
-sml_delay:
-
-  LDY #10
-  sml:
-  dbne y, sml
+  make_upper:
+    SUBA  #$20                        ;lower case is 32 characters above it's corresponding uppercase                         
+    bra next  
   
-  rts                
-         
+  make_lower:
+    ADDA #$20                         ;upper case is 32 characters below it's corresponding lowercase
+    bra next
+  
+  finish:
+    STAA  1,Y+
+    LDAA #$A                          ; load carriage return character to A register
+    STAA 1,Y+                         ; store byte in A register to address pointed by X index
+    LDAA #00                          ; load null character to A register
+    STAA 1,Y+                         ; store byte in A register to address pointed by X index
+    LDX #WRITE
+    LBRA send_str    
+    
+    
+    
+                    
 
 ;**************************************************************
 ;*                 Interrupt Vectors                          *
 ;**************************************************************
             ORG   $FFFE
             DC.W  Entry           ; Reset Vector
-

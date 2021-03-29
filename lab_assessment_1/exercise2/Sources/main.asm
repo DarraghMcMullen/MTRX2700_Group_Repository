@@ -20,6 +20,7 @@ DISPLAY_INDEX_LUT:    dc.b   %00001110,%00001101,%00001011,%00000111
 
 ;memory allocation for string
 STRING:   fcc  "test string 0123456789-"
+;STRING:   fcc   "1234"
 
 ;length of string
 STRING_LEN: rmb 1
@@ -40,7 +41,7 @@ LOOPS:  ds.w 1
 BUTTON_PRESSED:   rmb  1
 
 ;boolean value to select auto scroll mode, or button scroll mode
-SCROLL_MODE: dc.w 0 ;1=auto, 0=button, button is still active in auto mode
+SCROLL_MODE: dc.w 1 ;1=auto, 0=button, button is still active in auto mode
 
 ; code section
   ORG   ROMStart
@@ -62,10 +63,12 @@ Entry:
 ; init. string counter and string length
   movb #0, STRING_COUNTER
   movb #22, STRING_LEN
+  ;movb #4, STRING_LEN
+  ;movb #7, STRING_LEN
   
 ; main loop  
 main:
-  ;bsr checkButton ;check if SW2 is pressed (with debounce)
+  bsr checkButton ;check if SW2 is pressed (with debounce)
      
   bsr mPlex ;multiplex displays to write 4 character display string to displays
   
@@ -73,7 +76,7 @@ main:
   ldd LOOPS
   addd SCROLL_MODE ;if autoscroll enabled, loop will inc., else, loop will remain 0
   std LOOPS
-  subd #10000
+  subd #60
   bne main
   
   bsr rotateString  ;rotate currently displayed string left, adding next character from string to right
@@ -111,9 +114,10 @@ mPlex:
     ldab DISP_STRING_COUNTER
     ldaa b,x                     
     staa PTP
-    jsr delay1ms
+    jsr sml_delay
     ldaa #%00001111
     staa PTP
+    
 
     ;inc counter and loop
     ldaa DISP_STRING_COUNTER
@@ -171,11 +175,11 @@ checkButton:
   ;11110111 on PTH for SW2 pressed
   captureInitialPress:
     ldaa PTH
-    anda #%00010000 ;mask all inputs but SW2
-    cmpa #%00010000 ;z=1 if not pressed, z=0 if pressed
+    anda #$08 ;mask all inputs but SW2
+    cmpa #$08 ;z=1 if not pressed, z=0 if pressed
     beq exit        ;if not pressed, exit
   
-  ; debounce routine
+   ;debounce routine
   checkIfStillPressed:
     ;delay for 100ms
     ldy #100
@@ -196,6 +200,7 @@ checkButton:
 ;delay by 1ms * number in y register      
 delay1ms:
   pshx
+  LDY #100
   outerLoop: 
     ldx #1000
     innerLoop: 
@@ -217,7 +222,13 @@ delay1ms:
   
   rts        
           
-              
+sml_delay:
+
+  LDY #10
+  sml:
+  dbne y, sml
+  
+  rts                
          
 
 ;**************************************************************

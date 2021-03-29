@@ -8697,6 +8697,11 @@ Counter     DS.W 1
 FiboRes     DS.W 1
 
 ;---Reserved memory for input strings---
+NUL EQU $0
+LF EQU $A
+CR EQU $D
+
+
 WORD FCB "Memory"
 SPECIAL_CHARS FCB $A,$D,$0
 READ RMB 80
@@ -8729,7 +8734,7 @@ _Startup:
 
 
 mainLoop: 
-
+  MOVB #156, SCI1BDL                  ; set baud rate to 9600
   bsr task_number
     
 
@@ -8738,12 +8743,12 @@ task1: LDX #WORD                      ; loads word address into X register
     
 
 task2: LDX #READ                      ; loads word address into X register
+                         
     bsr readSCI1                      ; read string from serial data register
     
 
 send_str:
     LDAA 1,X+                         ; loads value at X into accumulator A & increment
-    CMPA #$00                         ; comparing value in A to 0 
     BEQ delay_reset                   ; delay when null character is found (end of string)
     
     bsr loadSCI1                      ; load character to serial 1 data register
@@ -8751,10 +8756,8 @@ send_str:
 
 
 ; -- Loads Character in A register to Serial 1 Data Register --
-loadSCI1:
-                
-    MOVB #156, SCI1BDL                ; set baud rate to 9600       
-    MOVB #$08, SCI1CR2                ; set control register values
+loadSCI1:                
+    MOVB #mSCI1CR2_TE, SCI1CR2        ; set control register to transmit data
     brclr SCI1SR1,mSCI1SR1_TDRE,*     ; waits for TDRE to be set
     staa SCI1DRL                      ; loads character from A register to data register
     rts
@@ -8762,20 +8765,19 @@ loadSCI1:
     
 ; -- Read incoming characters from Serial 1 Data Register, loop until return character encountered -- 
 readSCI1:                 
-    MOVB #156, SCI1BDL                ; set baud rate to 9600
-    MOVB #mSCI1CR2_RE, SCI1CR2        ; set control register to read incoming signals
+    MOVB #mSCI1CR2_RE, SCI1CR2        ; set control register to receive data
     brclr SCI1SR1, mSCI1SR1_RDRF,*    ; poll RDRF register
     LDAA SCI1DRL                      ; load value from data register to A register
     STAA 1,X+                         ; store value from A to X index 
-    CMPA #$D                          ; check if character in A register is the return character
+    CMPA #CR                          ; check if character in A register is the return character
     BEQ complete_string               ; branch to complete_string subroutine if return character encountered
     bra readSCI1                      ; otherwise, continue looping
 
 ; -- Adds carriage return and null character to end of string at address pointed by X index --
 complete_string:
-    LDAA #$A                          ; load carriage return character to A register
+    LDAA #LF                          ; load carriage return character to A register
     STAA 1,X+                         ; store byte in A register to address pointed by X index
-    LDAA #00                          ; load null character to A register
+    LDAA #NUL                         ; load null character to A register
     STAA 1,X+                         ; store byte in A register to address pointed by X index
     LDX #READ                         ; return X index to beginning of string
     bra send_str                      ; send string to serial interface
@@ -8792,9 +8794,9 @@ delay_reset:
   bra mainLoop
 
 
-task_number:
-  MOVB #$0,DDRH
-  LDAA PTH
+task_number:                          
+  MOVB #$0,DDRH                       ; set port H data direction register to input
+  LDAA PTH                            ; 
   CMPA #$1
   BEQ task1
   BNE task2
