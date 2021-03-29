@@ -65,8 +65,7 @@ _Startup:
 
 mainLoop: 
 
-  bsr task1
-  ;bsr task2
+  bsr task_number
     
 
 task1: LDX #WORD                      ; loads word address into X register  
@@ -126,6 +125,15 @@ delay_reset:
     DBNE X, LOOP1                     ; decremeny X, branch to LOOP1 if not 0
                
   bra mainLoop
+
+
+task_number:
+  MOVB #$0,DDRH
+  LDAA PTH
+  CMPA #$1
+  BEQ task1
+  BNE task2
+
 
 ;**************************************************************
 ;*                 Interrupt Vectors                          *
