@@ -31,14 +31,14 @@ Counter     DS.W 1
 FiboRes     DS.W 1
 
 ;---Reserved memory for input strings---
-NUL EQU $0
-LF EQU $A
-CR EQU $D
+NUL EQU $0                            ; Null character
+LF EQU $A                             ; Line feed character
+CR EQU $D                             ; Carriage return character
 
 
-WORD FCB "Memory"
-SPECIAL_CHARS FCB $A,$D,$0
-READ RMB 80
+WORD FCB "Memory"                     ; Transmit string for exercise 
+SPECIAL_CHARS FCB $A,$D,$0            ; Special characters, added to the end of the transmit string
+READ RMB 80                           ; Memory for storing received serial inputs
 
 ; code section
             ORG   ROMStart
@@ -83,7 +83,7 @@ task2: LDX #READ                      ; loads word address into X register
     
 
 send_str:
-    LDAA 1,X+                         ; loads value at X into accumulator A & increment
+    LDAA 1,X+                         ; loads value at X into register A & increment
     BEQ delay_reset                   ; delay when null character is found (end of string)
     
     bsr loadSCI1                      ; load character to serial 1 data register
@@ -131,10 +131,10 @@ delay_reset:
 
 task_number:                          
   MOVB #$0,DDRH                       ; set port H data direction register to input
-  LDAA PTH                            ; 
-  CMPA #$1
-  BEQ task1
-  BNE task2
+  LDAA PTH                            ; load port H value to A register 
+  CMPA #$1                            ; compare with hex 1
+  BEQ task1                           ; perform task 1 if equal
+  BNE task2                           ; perform task 2/3/4 if not equal
 
 
 ;**************************************************************

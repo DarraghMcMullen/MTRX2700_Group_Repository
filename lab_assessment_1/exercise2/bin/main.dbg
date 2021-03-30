@@ -8686,8 +8686,8 @@ ASCII_SSEG_LUT:    dc.b   %00000000,%00000110,%01000010,%10101101,%11101101,%101
 DISPLAY_INDEX_LUT:    dc.b   %00001110,%00001101,%00001011,%00000111
 
 ;memory allocation for string
-;STRING:   fcc  "test string 0123456789-"
-STRING:   fcc   "1234"
+STRING:   fcc  "test string 0123456789-"
+;STRING:   fcc   "1234"
 
 ;length of string
 STRING_LEN: rmb 1
@@ -8708,10 +8708,10 @@ LOOPS:  ds.w 1
 BUTTON_PRESSED:   rmb  1
 
 ;boolean value to select auto scroll mode, or button scroll mode
-SCROLL_MODE: dc.w 0 ;1=auto, 0=button, button is still active in auto mode
+SCROLL_MODE: dc.w 1 ;1=auto, 0=button, button is still active in auto mode
 
 ;number of displays to use in multiplex routine (max = 4)
-N_DISPS: dc.b 1    ;default = 4
+N_DISPS: dc.b 4    ;default = 4
 
 ; code section
   ORG   ROMStart
@@ -8732,9 +8732,8 @@ Entry:
 
 ; init. string counter and string length
   movb #0, STRING_COUNTER
-  ;movb #22, STRING_LEN
-  movb #4, STRING_LEN
-  ;movb #7, STRING_LEN
+  movb #22, STRING_LEN
+  ;movb #4, STRING_LEN
   
   
   

@@ -8786,7 +8786,7 @@ complete_string:
 delay_reset:   
   LDX #60000                          ; load 60000 into X  
   LOOP1:
-    LDY #100                          ; load 100 into Y
+    LDY #100                          ; load 400 into Y
     LOOP2:
       DBNE Y, LOOP2                   ; decrement Y, branch to LOOP2 if not 0
     DBNE X, LOOP1                     ; decremeny X, branch to LOOP1 if not 0

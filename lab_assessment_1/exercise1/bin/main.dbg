@@ -22,16 +22,16 @@
  ;
 
 			; include derivative specific macros
-            INCLUDE 'mc9s12dg256.inc'
-; Based on CPU DB MC9S12DG256_112, version 2.87.346 (RegistersPrg V2.28)
+            INCLUDE 'mc9s12dt256b.inc'
+; Based on CPU DB MC9S12DT256B_112, version 2.87.338 (RegistersPrg V2.28)
 
 ; ###################################################################
-;     Filename  : mc9s12dg256.inc
-;     Processor : MC9S12DG256CPV
+;     Filename  : mc9s12dt256b.inc
+;     Processor : MC9S12DT256BCPV
 ;     FileFormat: V2.28
-;     DataSheet : 9S12DT256DGV3/D V03.04
+;     DataSheet : 9S12DP256BDGV2/D V02.15
 ;     Compiler  : CodeWarrior compiler
-;     Date/Time : 2.7.2009, 8:36
+;     Date/Time : 2.7.2009, 8:37
 ;     Abstract  :
 ;         This header implements the mapping of I/O devices.
 ;
@@ -41,7 +41,7 @@
 ;     mail      : support@freescale.com
 ;
 ;     CPU Registers Revisions:
-;      - 24.05.2006, V2.87.285:
+;      - 24.05.2006, V2.87.275:
 ;              - Removed bits MCCNTlo_BIT0..MCCNTlo_BIT7 and MCCNThi_BIT8.. MCCNThi_BIT15. REASON: Bug-fix (#3166 in Issue Manager)
 ;
 ;     File-Format-Revisions:
@@ -170,10 +170,10 @@ VReserved47:        equ   $0000FFA0
 VReserved46:        equ   $0000FFA2
 VReserved45:        equ   $0000FFA4
 VReserved44:        equ   $0000FFA6
-VReserved43:        equ   $0000FFA8
-VReserved42:        equ   $0000FFAA
-VReserved41:        equ   $0000FFAC
-VReserved40:        equ   $0000FFAE
+Vcan1tx:            equ   $0000FFA8
+Vcan1rx:            equ   $0000FFAA
+Vcan1err:           equ   $0000FFAC
+Vcan1wkup:          equ   $0000FFAE
 Vcan0tx:            equ   $0000FFB0
 Vcan0rx:            equ   $0000FFB2
 Vcan0err:           equ   $0000FFB4
@@ -3918,8 +3918,8 @@ FSEC_NV2:           equ    2                                         ; Non Volat
 FSEC_NV3:           equ    3                                         ; Non Volatile flag bit 3
 FSEC_NV4:           equ    4                                         ; Non Volatile flag bit 4
 FSEC_NV5:           equ    5                                         ; Non Volatile flag bit 5
-FSEC_KEYEN0:        equ    6                                         ; Backdoor Key Security Enable Bit 0
-FSEC_KEYEN1:        equ    7                                         ; Backdoor Key Security Enable Bit 1
+FSEC_NV6:           equ    6                                         ; Non Volatile flag bit 6
+FSEC_KEYEN:         equ    7                                         ; Backdoor Key Security Enable
 ; bit position masks
 mFSEC_SEC0:         equ    %00000001
 mFSEC_SEC1:         equ    %00000010
@@ -3927,8 +3927,8 @@ mFSEC_NV2:          equ    %00000100
 mFSEC_NV3:          equ    %00001000
 mFSEC_NV4:          equ    %00010000
 mFSEC_NV5:          equ    %00100000
-mFSEC_KEYEN0:       equ    %01000000
-mFSEC_KEYEN1:       equ    %10000000
+mFSEC_NV6:          equ    %01000000
+mFSEC_KEYEN:        equ    %10000000
 
 
 ;*** FCNFG - Flash Configuration Register; 0x00000103 ***
@@ -6137,6 +6137,1350 @@ mCAN0TXTSRL_TSR4:   equ    %00010000
 mCAN0TXTSRL_TSR5:   equ    %00100000
 mCAN0TXTSRL_TSR6:   equ    %01000000
 mCAN0TXTSRL_TSR7:   equ    %10000000
+
+
+;*** CAN1CTL0 - MSCAN 1 Control 0 Register; 0x00000180 ***
+CAN1CTL0:           equ    $00000180                                ;*** CAN1CTL0 - MSCAN 1 Control 0 Register; 0x00000180 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1CTL0_INITRQ:    equ    0                                         ; Initialization Mode Request
+CAN1CTL0_SLPRQ:     equ    1                                         ; Sleep Mode Request
+CAN1CTL0_WUPE:      equ    2                                         ; Wake-Up Enable
+CAN1CTL0_TIME:      equ    3                                         ; Timer Enable
+CAN1CTL0_SYNCH:     equ    4                                         ; Synchronized Status
+CAN1CTL0_CSWAI:     equ    5                                         ; CAN Stops in Wait Mode
+CAN1CTL0_RXACT:     equ    6                                         ; Receiver Active Status
+CAN1CTL0_RXFRM:     equ    7                                         ; Received Frame Flag
+; bit position masks
+mCAN1CTL0_INITRQ:   equ    %00000001
+mCAN1CTL0_SLPRQ:    equ    %00000010
+mCAN1CTL0_WUPE:     equ    %00000100
+mCAN1CTL0_TIME:     equ    %00001000
+mCAN1CTL0_SYNCH:    equ    %00010000
+mCAN1CTL0_CSWAI:    equ    %00100000
+mCAN1CTL0_RXACT:    equ    %01000000
+mCAN1CTL0_RXFRM:    equ    %10000000
+
+
+;*** CAN1CTL1 - MSCAN 1 Control 1 Register; 0x00000181 ***
+CAN1CTL1:           equ    $00000181                                ;*** CAN1CTL1 - MSCAN 1 Control 1 Register; 0x00000181 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1CTL1_INITAK:    equ    0                                         ; Initialization Mode Acknowledge
+CAN1CTL1_SLPAK:     equ    1                                         ; Sleep Mode Acknowledge
+CAN1CTL1_WUPM:      equ    2                                         ; Wake-Up Mode
+CAN1CTL1_LISTEN:    equ    4                                         ; Listen Only Mode
+CAN1CTL1_LOOPB:     equ    5                                         ; Loop Back Self Test Mode
+CAN1CTL1_CLKSRC:    equ    6                                         ; MSCAN 1 Clock Source
+CAN1CTL1_CANE:      equ    7                                         ; MSCAN 1 Enable
+; bit position masks
+mCAN1CTL1_INITAK:   equ    %00000001
+mCAN1CTL1_SLPAK:    equ    %00000010
+mCAN1CTL1_WUPM:     equ    %00000100
+mCAN1CTL1_LISTEN:   equ    %00010000
+mCAN1CTL1_LOOPB:    equ    %00100000
+mCAN1CTL1_CLKSRC:   equ    %01000000
+mCAN1CTL1_CANE:     equ    %10000000
+
+
+;*** CAN1BTR0 - MSCAN 1 Bus Timing Register 0; 0x00000182 ***
+CAN1BTR0:           equ    $00000182                                ;*** CAN1BTR0 - MSCAN 1 Bus Timing Register 0; 0x00000182 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1BTR0_BRP0:      equ    0                                         ; Baud Rate Prescaler 0
+CAN1BTR0_BRP1:      equ    1                                         ; Baud Rate Prescaler 1
+CAN1BTR0_BRP2:      equ    2                                         ; Baud Rate Prescaler 2
+CAN1BTR0_BRP3:      equ    3                                         ; Baud Rate Prescaler 3
+CAN1BTR0_BRP4:      equ    4                                         ; Baud Rate Prescaler 4
+CAN1BTR0_BRP5:      equ    5                                         ; Baud Rate Prescaler 5
+CAN1BTR0_SJW0:      equ    6                                         ; Synchronization Jump Width 0
+CAN1BTR0_SJW1:      equ    7                                         ; Synchronization Jump Width 1
+; bit position masks
+mCAN1BTR0_BRP0:     equ    %00000001
+mCAN1BTR0_BRP1:     equ    %00000010
+mCAN1BTR0_BRP2:     equ    %00000100
+mCAN1BTR0_BRP3:     equ    %00001000
+mCAN1BTR0_BRP4:     equ    %00010000
+mCAN1BTR0_BRP5:     equ    %00100000
+mCAN1BTR0_SJW0:     equ    %01000000
+mCAN1BTR0_SJW1:     equ    %10000000
+
+
+;*** CAN1BTR1 - MSCAN 1 Bus Timing Register 1; 0x00000183 ***
+CAN1BTR1:           equ    $00000183                                ;*** CAN1BTR1 - MSCAN 1 Bus Timing Register 1; 0x00000183 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1BTR1_TSEG10:    equ    0                                         ; Time Segment 10
+CAN1BTR1_TSEG11:    equ    1                                         ; Time Segment 11
+CAN1BTR1_TSEG12:    equ    2                                         ; Time Segment 12
+CAN1BTR1_TSEG13:    equ    3                                         ; Time Segment 13
+CAN1BTR1_TSEG20:    equ    4                                         ; Time Segment 20
+CAN1BTR1_TSEG21:    equ    5                                         ; Time Segment 21
+CAN1BTR1_TSEG22:    equ    6                                         ; Time Segment 22
+CAN1BTR1_SAMP:      equ    7                                         ; Sampling
+; bit position masks
+mCAN1BTR1_TSEG10:   equ    %00000001
+mCAN1BTR1_TSEG11:   equ    %00000010
+mCAN1BTR1_TSEG12:   equ    %00000100
+mCAN1BTR1_TSEG13:   equ    %00001000
+mCAN1BTR1_TSEG20:   equ    %00010000
+mCAN1BTR1_TSEG21:   equ    %00100000
+mCAN1BTR1_TSEG22:   equ    %01000000
+mCAN1BTR1_SAMP:     equ    %10000000
+
+
+;*** CAN1RFLG - MSCAN 1 Receiver Flag Register; 0x00000184 ***
+CAN1RFLG:           equ    $00000184                                ;*** CAN1RFLG - MSCAN 1 Receiver Flag Register; 0x00000184 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1RFLG_RXF:       equ    0                                         ; Receive Buffer Full
+CAN1RFLG_OVRIF:     equ    1                                         ; Overrun Interrupt Flag
+CAN1RFLG_TSTAT0:    equ    2                                         ; Transmitter Status Bit 0
+CAN1RFLG_TSTAT1:    equ    3                                         ; Transmitter Status Bit 1
+CAN1RFLG_RSTAT0:    equ    4                                         ; Receiver Status Bit 0
+CAN1RFLG_RSTAT1:    equ    5                                         ; Receiver Status Bit 1
+CAN1RFLG_CSCIF:     equ    6                                         ; CAN Status Change Interrupt Flag
+CAN1RFLG_WUPIF:     equ    7                                         ; Wake-up Interrupt Flag
+; bit position masks
+mCAN1RFLG_RXF:      equ    %00000001
+mCAN1RFLG_OVRIF:    equ    %00000010
+mCAN1RFLG_TSTAT0:   equ    %00000100
+mCAN1RFLG_TSTAT1:   equ    %00001000
+mCAN1RFLG_RSTAT0:   equ    %00010000
+mCAN1RFLG_RSTAT1:   equ    %00100000
+mCAN1RFLG_CSCIF:    equ    %01000000
+mCAN1RFLG_WUPIF:    equ    %10000000
+
+
+;*** CAN1RIER - MSCAN 1 Receiver Interrupt Enable Register; 0x00000185 ***
+CAN1RIER:           equ    $00000185                                ;*** CAN1RIER - MSCAN 1 Receiver Interrupt Enable Register; 0x00000185 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1RIER_RXFIE:     equ    0                                         ; Receiver Full Interrupt Enable
+CAN1RIER_OVRIE:     equ    1                                         ; Overrun Interrupt Enable
+CAN1RIER_TSTATE0:   equ    2                                         ; Transmitter Status Change Enable 0
+CAN1RIER_TSTATE1:   equ    3                                         ; Transmitter Status Change Enable 1
+CAN1RIER_RSTATE0:   equ    4                                         ; Receiver Status Change Enable 0
+CAN1RIER_RSTATE1:   equ    5                                         ; Receiver Status Change Enable 1
+CAN1RIER_CSCIE:     equ    6                                         ; CAN Status Change Interrupt Enable
+CAN1RIER_WUPIE:     equ    7                                         ; Wake-up Interrupt Enable
+; bit position masks
+mCAN1RIER_RXFIE:    equ    %00000001
+mCAN1RIER_OVRIE:    equ    %00000010
+mCAN1RIER_TSTATE0:  equ    %00000100
+mCAN1RIER_TSTATE1:  equ    %00001000
+mCAN1RIER_RSTATE0:  equ    %00010000
+mCAN1RIER_RSTATE1:  equ    %00100000
+mCAN1RIER_CSCIE:    equ    %01000000
+mCAN1RIER_WUPIE:    equ    %10000000
+
+
+;*** CAN1TFLG - MSCAN 1 Transmitter Flag Register; 0x00000186 ***
+CAN1TFLG:           equ    $00000186                                ;*** CAN1TFLG - MSCAN 1 Transmitter Flag Register; 0x00000186 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1TFLG_TXE0:      equ    0                                         ; Transmitter Buffer Empty 0
+CAN1TFLG_TXE1:      equ    1                                         ; Transmitter Buffer Empty 1
+CAN1TFLG_TXE2:      equ    2                                         ; Transmitter Buffer Empty 2
+; bit position masks
+mCAN1TFLG_TXE0:     equ    %00000001
+mCAN1TFLG_TXE1:     equ    %00000010
+mCAN1TFLG_TXE2:     equ    %00000100
+
+
+;*** CAN1TIER - MSCAN 1 Transmitter Interrupt Enable Register; 0x00000187 ***
+CAN1TIER:           equ    $00000187                                ;*** CAN1TIER - MSCAN 1 Transmitter Interrupt Enable Register; 0x00000187 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1TIER_TXEIE0:    equ    0                                         ; Transmitter Empty Interrupt Enable 0
+CAN1TIER_TXEIE1:    equ    1                                         ; Transmitter Empty Interrupt Enable 1
+CAN1TIER_TXEIE2:    equ    2                                         ; Transmitter Empty Interrupt Enable 2
+; bit position masks
+mCAN1TIER_TXEIE0:   equ    %00000001
+mCAN1TIER_TXEIE1:   equ    %00000010
+mCAN1TIER_TXEIE2:   equ    %00000100
+
+
+;*** CAN1TARQ - MSCAN 1 Transmitter Message Abort Request; 0x00000188 ***
+CAN1TARQ:           equ    $00000188                                ;*** CAN1TARQ - MSCAN 1 Transmitter Message Abort Request; 0x00000188 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1TARQ_ABTRQ0:    equ    0                                         ; Abort Request 0
+CAN1TARQ_ABTRQ1:    equ    1                                         ; Abort Request 1
+CAN1TARQ_ABTRQ2:    equ    2                                         ; Abort Request 2
+; bit position masks
+mCAN1TARQ_ABTRQ0:   equ    %00000001
+mCAN1TARQ_ABTRQ1:   equ    %00000010
+mCAN1TARQ_ABTRQ2:   equ    %00000100
+
+
+;*** CAN1TAAK - MSCAN 1 Transmitter Message Abort Control; 0x00000189 ***
+CAN1TAAK:           equ    $00000189                                ;*** CAN1TAAK - MSCAN 1 Transmitter Message Abort Control; 0x00000189 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1TAAK_ABTAK0:    equ    0                                         ; Abort Acknowledge 0
+CAN1TAAK_ABTAK1:    equ    1                                         ; Abort Acknowledge 1
+CAN1TAAK_ABTAK2:    equ    2                                         ; Abort Acknowledge 2
+; bit position masks
+mCAN1TAAK_ABTAK0:   equ    %00000001
+mCAN1TAAK_ABTAK1:   equ    %00000010
+mCAN1TAAK_ABTAK2:   equ    %00000100
+
+
+;*** CAN1TBSEL - MSCAN 1 Transmit Buffer Selection; 0x0000018A ***
+CAN1TBSEL:          equ    $0000018A                                ;*** CAN1TBSEL - MSCAN 1 Transmit Buffer Selection; 0x0000018A ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1TBSEL_TX0:      equ    0                                         ; Transmit Buffer Select 0
+CAN1TBSEL_TX1:      equ    1                                         ; Transmit Buffer Select 1
+CAN1TBSEL_TX2:      equ    2                                         ; Transmit Buffer Select 2
+; bit position masks
+mCAN1TBSEL_TX0:     equ    %00000001
+mCAN1TBSEL_TX1:     equ    %00000010
+mCAN1TBSEL_TX2:     equ    %00000100
+
+
+;*** CAN1IDAC - MSCAN 1 Identifier Acceptance Control Register; 0x0000018B ***
+CAN1IDAC:           equ    $0000018B                                ;*** CAN1IDAC - MSCAN 1 Identifier Acceptance Control Register; 0x0000018B ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1IDAC_IDHIT0:    equ    0                                         ; Identifier Acceptance Hit Indicator 0
+CAN1IDAC_IDHIT1:    equ    1                                         ; Identifier Acceptance Hit Indicator 1
+CAN1IDAC_IDHIT2:    equ    2                                         ; Identifier Acceptance Hit Indicator 2
+CAN1IDAC_IDAM0:     equ    4                                         ; Identifier Acceptance Mode 0
+CAN1IDAC_IDAM1:     equ    5                                         ; Identifier Acceptance Mode 1
+; bit position masks
+mCAN1IDAC_IDHIT0:   equ    %00000001
+mCAN1IDAC_IDHIT1:   equ    %00000010
+mCAN1IDAC_IDHIT2:   equ    %00000100
+mCAN1IDAC_IDAM0:    equ    %00010000
+mCAN1IDAC_IDAM1:    equ    %00100000
+
+
+;*** CAN1RXERR - MSCAN 1 Receive Error Counter Register; 0x0000018E ***
+CAN1RXERR:          equ    $0000018E                                ;*** CAN1RXERR - MSCAN 1 Receive Error Counter Register; 0x0000018E ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1RXERR_RXERR0:   equ    0                                         ; Bit 0
+CAN1RXERR_RXERR1:   equ    1                                         ; Bit 1
+CAN1RXERR_RXERR2:   equ    2                                         ; Bit 2
+CAN1RXERR_RXERR3:   equ    3                                         ; Bit 3
+CAN1RXERR_RXERR4:   equ    4                                         ; Bit 4
+CAN1RXERR_RXERR5:   equ    5                                         ; Bit 5
+CAN1RXERR_RXERR6:   equ    6                                         ; Bit 6
+CAN1RXERR_RXERR7:   equ    7                                         ; Bit 7
+; bit position masks
+mCAN1RXERR_RXERR0:  equ    %00000001
+mCAN1RXERR_RXERR1:  equ    %00000010
+mCAN1RXERR_RXERR2:  equ    %00000100
+mCAN1RXERR_RXERR3:  equ    %00001000
+mCAN1RXERR_RXERR4:  equ    %00010000
+mCAN1RXERR_RXERR5:  equ    %00100000
+mCAN1RXERR_RXERR6:  equ    %01000000
+mCAN1RXERR_RXERR7:  equ    %10000000
+
+
+;*** CAN1TXERR - MSCAN 1 Transmit Error Counter Register; 0x0000018F ***
+CAN1TXERR:          equ    $0000018F                                ;*** CAN1TXERR - MSCAN 1 Transmit Error Counter Register; 0x0000018F ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1TXERR_TXERR0:   equ    0                                         ; Bit 0
+CAN1TXERR_TXERR1:   equ    1                                         ; Bit 1
+CAN1TXERR_TXERR2:   equ    2                                         ; Bit 2
+CAN1TXERR_TXERR3:   equ    3                                         ; Bit 3
+CAN1TXERR_TXERR4:   equ    4                                         ; Bit 4
+CAN1TXERR_TXERR5:   equ    5                                         ; Bit 5
+CAN1TXERR_TXERR6:   equ    6                                         ; Bit 6
+CAN1TXERR_TXERR7:   equ    7                                         ; Bit 7
+; bit position masks
+mCAN1TXERR_TXERR0:  equ    %00000001
+mCAN1TXERR_TXERR1:  equ    %00000010
+mCAN1TXERR_TXERR2:  equ    %00000100
+mCAN1TXERR_TXERR3:  equ    %00001000
+mCAN1TXERR_TXERR4:  equ    %00010000
+mCAN1TXERR_TXERR5:  equ    %00100000
+mCAN1TXERR_TXERR6:  equ    %01000000
+mCAN1TXERR_TXERR7:  equ    %10000000
+
+
+;*** CAN1IDAR0 - MSCAN 1 Identifier Acceptance Register 0; 0x00000190 ***
+CAN1IDAR0:          equ    $00000190                                ;*** CAN1IDAR0 - MSCAN 1 Identifier Acceptance Register 0; 0x00000190 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1IDAR0_AC0:      equ    0                                         ; Acceptance Code Bit 0
+CAN1IDAR0_AC1:      equ    1                                         ; Acceptance Code Bit 1
+CAN1IDAR0_AC2:      equ    2                                         ; Acceptance Code Bit 2
+CAN1IDAR0_AC3:      equ    3                                         ; Acceptance Code Bit 3
+CAN1IDAR0_AC4:      equ    4                                         ; Acceptance Code Bit 4
+CAN1IDAR0_AC5:      equ    5                                         ; Acceptance Code Bit 5
+CAN1IDAR0_AC6:      equ    6                                         ; Acceptance Code Bit 6
+CAN1IDAR0_AC7:      equ    7                                         ; Acceptance Code Bit 7
+; bit position masks
+mCAN1IDAR0_AC0:     equ    %00000001
+mCAN1IDAR0_AC1:     equ    %00000010
+mCAN1IDAR0_AC2:     equ    %00000100
+mCAN1IDAR0_AC3:     equ    %00001000
+mCAN1IDAR0_AC4:     equ    %00010000
+mCAN1IDAR0_AC5:     equ    %00100000
+mCAN1IDAR0_AC6:     equ    %01000000
+mCAN1IDAR0_AC7:     equ    %10000000
+
+
+;*** CAN1IDAR1 - MSCAN 1 Identifier Acceptance Register 1; 0x00000191 ***
+CAN1IDAR1:          equ    $00000191                                ;*** CAN1IDAR1 - MSCAN 1 Identifier Acceptance Register 1; 0x00000191 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1IDAR1_AC0:      equ    0                                         ; Acceptance Code Bit 0
+CAN1IDAR1_AC1:      equ    1                                         ; Acceptance Code Bit 1
+CAN1IDAR1_AC2:      equ    2                                         ; Acceptance Code Bit 2
+CAN1IDAR1_AC3:      equ    3                                         ; Acceptance Code Bit 3
+CAN1IDAR1_AC4:      equ    4                                         ; Acceptance Code Bit 4
+CAN1IDAR1_AC5:      equ    5                                         ; Acceptance Code Bit 5
+CAN1IDAR1_AC6:      equ    6                                         ; Acceptance Code Bit 6
+CAN1IDAR1_AC7:      equ    7                                         ; Acceptance Code Bit 7
+; bit position masks
+mCAN1IDAR1_AC0:     equ    %00000001
+mCAN1IDAR1_AC1:     equ    %00000010
+mCAN1IDAR1_AC2:     equ    %00000100
+mCAN1IDAR1_AC3:     equ    %00001000
+mCAN1IDAR1_AC4:     equ    %00010000
+mCAN1IDAR1_AC5:     equ    %00100000
+mCAN1IDAR1_AC6:     equ    %01000000
+mCAN1IDAR1_AC7:     equ    %10000000
+
+
+;*** CAN1IDAR2 - MSCAN 1 Identifier Acceptance Register 2; 0x00000192 ***
+CAN1IDAR2:          equ    $00000192                                ;*** CAN1IDAR2 - MSCAN 1 Identifier Acceptance Register 2; 0x00000192 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1IDAR2_AC0:      equ    0                                         ; Acceptance Code Bit 0
+CAN1IDAR2_AC1:      equ    1                                         ; Acceptance Code Bit 1
+CAN1IDAR2_AC2:      equ    2                                         ; Acceptance Code Bit 2
+CAN1IDAR2_AC3:      equ    3                                         ; Acceptance Code Bit 3
+CAN1IDAR2_AC4:      equ    4                                         ; Acceptance Code Bit 4
+CAN1IDAR2_AC5:      equ    5                                         ; Acceptance Code Bit 5
+CAN1IDAR2_AC6:      equ    6                                         ; Acceptance Code Bit 6
+CAN1IDAR2_AC7:      equ    7                                         ; Acceptance Code Bit 7
+; bit position masks
+mCAN1IDAR2_AC0:     equ    %00000001
+mCAN1IDAR2_AC1:     equ    %00000010
+mCAN1IDAR2_AC2:     equ    %00000100
+mCAN1IDAR2_AC3:     equ    %00001000
+mCAN1IDAR2_AC4:     equ    %00010000
+mCAN1IDAR2_AC5:     equ    %00100000
+mCAN1IDAR2_AC6:     equ    %01000000
+mCAN1IDAR2_AC7:     equ    %10000000
+
+
+;*** CAN1IDAR3 - MSCAN 1 Identifier Acceptance Register 3; 0x00000193 ***
+CAN1IDAR3:          equ    $00000193                                ;*** CAN1IDAR3 - MSCAN 1 Identifier Acceptance Register 3; 0x00000193 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1IDAR3_AC0:      equ    0                                         ; Acceptance Code Bit 0
+CAN1IDAR3_AC1:      equ    1                                         ; Acceptance Code Bit 1
+CAN1IDAR3_AC2:      equ    2                                         ; Acceptance Code Bit 2
+CAN1IDAR3_AC3:      equ    3                                         ; Acceptance Code Bit 3
+CAN1IDAR3_AC4:      equ    4                                         ; Acceptance Code Bit 4
+CAN1IDAR3_AC5:      equ    5                                         ; Acceptance Code Bit 5
+CAN1IDAR3_AC6:      equ    6                                         ; Acceptance Code Bit 6
+CAN1IDAR3_AC7:      equ    7                                         ; Acceptance Code Bit 7
+; bit position masks
+mCAN1IDAR3_AC0:     equ    %00000001
+mCAN1IDAR3_AC1:     equ    %00000010
+mCAN1IDAR3_AC2:     equ    %00000100
+mCAN1IDAR3_AC3:     equ    %00001000
+mCAN1IDAR3_AC4:     equ    %00010000
+mCAN1IDAR3_AC5:     equ    %00100000
+mCAN1IDAR3_AC6:     equ    %01000000
+mCAN1IDAR3_AC7:     equ    %10000000
+
+
+;*** CAN1IDMR0 - MSCAN 1 Identifier Mask Register 0; 0x00000194 ***
+CAN1IDMR0:          equ    $00000194                                ;*** CAN1IDMR0 - MSCAN 1 Identifier Mask Register 0; 0x00000194 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1IDMR0_AM0:      equ    0                                         ; Acceptance Mask Bit 0
+CAN1IDMR0_AM1:      equ    1                                         ; Acceptance Mask Bit 1
+CAN1IDMR0_AM2:      equ    2                                         ; Acceptance Mask Bit 2
+CAN1IDMR0_AM3:      equ    3                                         ; Acceptance Mask Bit 3
+CAN1IDMR0_AM4:      equ    4                                         ; Acceptance Mask Bit 4
+CAN1IDMR0_AM5:      equ    5                                         ; Acceptance Mask Bit 5
+CAN1IDMR0_AM6:      equ    6                                         ; Acceptance Mask Bit 6
+CAN1IDMR0_AM7:      equ    7                                         ; Acceptance Mask Bit 7
+; bit position masks
+mCAN1IDMR0_AM0:     equ    %00000001
+mCAN1IDMR0_AM1:     equ    %00000010
+mCAN1IDMR0_AM2:     equ    %00000100
+mCAN1IDMR0_AM3:     equ    %00001000
+mCAN1IDMR0_AM4:     equ    %00010000
+mCAN1IDMR0_AM5:     equ    %00100000
+mCAN1IDMR0_AM6:     equ    %01000000
+mCAN1IDMR0_AM7:     equ    %10000000
+
+
+;*** CAN1IDMR1 - MSCAN 1 Identifier Mask Register 1; 0x00000195 ***
+CAN1IDMR1:          equ    $00000195                                ;*** CAN1IDMR1 - MSCAN 1 Identifier Mask Register 1; 0x00000195 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1IDMR1_AM0:      equ    0                                         ; Acceptance Mask Bit 0
+CAN1IDMR1_AM1:      equ    1                                         ; Acceptance Mask Bit 1
+CAN1IDMR1_AM2:      equ    2                                         ; Acceptance Mask Bit 2
+CAN1IDMR1_AM3:      equ    3                                         ; Acceptance Mask Bit 3
+CAN1IDMR1_AM4:      equ    4                                         ; Acceptance Mask Bit 4
+CAN1IDMR1_AM5:      equ    5                                         ; Acceptance Mask Bit 5
+CAN1IDMR1_AM6:      equ    6                                         ; Acceptance Mask Bit 6
+CAN1IDMR1_AM7:      equ    7                                         ; Acceptance Mask Bit 7
+; bit position masks
+mCAN1IDMR1_AM0:     equ    %00000001
+mCAN1IDMR1_AM1:     equ    %00000010
+mCAN1IDMR1_AM2:     equ    %00000100
+mCAN1IDMR1_AM3:     equ    %00001000
+mCAN1IDMR1_AM4:     equ    %00010000
+mCAN1IDMR1_AM5:     equ    %00100000
+mCAN1IDMR1_AM6:     equ    %01000000
+mCAN1IDMR1_AM7:     equ    %10000000
+
+
+;*** CAN1IDMR2 - MSCAN 1 Identifier Mask Register 2; 0x00000196 ***
+CAN1IDMR2:          equ    $00000196                                ;*** CAN1IDMR2 - MSCAN 1 Identifier Mask Register 2; 0x00000196 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1IDMR2_AM0:      equ    0                                         ; Acceptance Mask Bit 0
+CAN1IDMR2_AM1:      equ    1                                         ; Acceptance Mask Bit 1
+CAN1IDMR2_AM2:      equ    2                                         ; Acceptance Mask Bit 2
+CAN1IDMR2_AM3:      equ    3                                         ; Acceptance Mask Bit 3
+CAN1IDMR2_AM4:      equ    4                                         ; Acceptance Mask Bit 4
+CAN1IDMR2_AM5:      equ    5                                         ; Acceptance Mask Bit 5
+CAN1IDMR2_AM6:      equ    6                                         ; Acceptance Mask Bit 6
+CAN1IDMR2_AM7:      equ    7                                         ; Acceptance Mask Bit 7
+; bit position masks
+mCAN1IDMR2_AM0:     equ    %00000001
+mCAN1IDMR2_AM1:     equ    %00000010
+mCAN1IDMR2_AM2:     equ    %00000100
+mCAN1IDMR2_AM3:     equ    %00001000
+mCAN1IDMR2_AM4:     equ    %00010000
+mCAN1IDMR2_AM5:     equ    %00100000
+mCAN1IDMR2_AM6:     equ    %01000000
+mCAN1IDMR2_AM7:     equ    %10000000
+
+
+;*** CAN1IDMR3 - MSCAN 1 Identifier Mask Register 3; 0x00000197 ***
+CAN1IDMR3:          equ    $00000197                                ;*** CAN1IDMR3 - MSCAN 1 Identifier Mask Register 3; 0x00000197 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1IDMR3_AM0:      equ    0                                         ; Acceptance Mask Bit 0
+CAN1IDMR3_AM1:      equ    1                                         ; Acceptance Mask Bit 1
+CAN1IDMR3_AM2:      equ    2                                         ; Acceptance Mask Bit 2
+CAN1IDMR3_AM3:      equ    3                                         ; Acceptance Mask Bit 3
+CAN1IDMR3_AM4:      equ    4                                         ; Acceptance Mask Bit 4
+CAN1IDMR3_AM5:      equ    5                                         ; Acceptance Mask Bit 5
+CAN1IDMR3_AM6:      equ    6                                         ; Acceptance Mask Bit 6
+CAN1IDMR3_AM7:      equ    7                                         ; Acceptance Mask Bit 7
+; bit position masks
+mCAN1IDMR3_AM0:     equ    %00000001
+mCAN1IDMR3_AM1:     equ    %00000010
+mCAN1IDMR3_AM2:     equ    %00000100
+mCAN1IDMR3_AM3:     equ    %00001000
+mCAN1IDMR3_AM4:     equ    %00010000
+mCAN1IDMR3_AM5:     equ    %00100000
+mCAN1IDMR3_AM6:     equ    %01000000
+mCAN1IDMR3_AM7:     equ    %10000000
+
+
+;*** CAN1IDAR4 - MSCAN 1 Identifier Acceptance Register 4; 0x00000198 ***
+CAN1IDAR4:          equ    $00000198                                ;*** CAN1IDAR4 - MSCAN 1 Identifier Acceptance Register 4; 0x00000198 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1IDAR4_AC0:      equ    0                                         ; Acceptance Code Bit 0
+CAN1IDAR4_AC1:      equ    1                                         ; Acceptance Code Bit 1
+CAN1IDAR4_AC2:      equ    2                                         ; Acceptance Code Bit 2
+CAN1IDAR4_AC3:      equ    3                                         ; Acceptance Code Bit 3
+CAN1IDAR4_AC4:      equ    4                                         ; Acceptance Code Bit 4
+CAN1IDAR4_AC5:      equ    5                                         ; Acceptance Code Bit 5
+CAN1IDAR4_AC6:      equ    6                                         ; Acceptance Code Bit 6
+CAN1IDAR4_AC7:      equ    7                                         ; Acceptance Code Bit 7
+; bit position masks
+mCAN1IDAR4_AC0:     equ    %00000001
+mCAN1IDAR4_AC1:     equ    %00000010
+mCAN1IDAR4_AC2:     equ    %00000100
+mCAN1IDAR4_AC3:     equ    %00001000
+mCAN1IDAR4_AC4:     equ    %00010000
+mCAN1IDAR4_AC5:     equ    %00100000
+mCAN1IDAR4_AC6:     equ    %01000000
+mCAN1IDAR4_AC7:     equ    %10000000
+
+
+;*** CAN1IDAR5 - MSCAN 1 Identifier Acceptance Register 5; 0x00000199 ***
+CAN1IDAR5:          equ    $00000199                                ;*** CAN1IDAR5 - MSCAN 1 Identifier Acceptance Register 5; 0x00000199 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1IDAR5_AC0:      equ    0                                         ; Acceptance Code Bit 0
+CAN1IDAR5_AC1:      equ    1                                         ; Acceptance Code Bit 1
+CAN1IDAR5_AC2:      equ    2                                         ; Acceptance Code Bit 2
+CAN1IDAR5_AC3:      equ    3                                         ; Acceptance Code Bit 3
+CAN1IDAR5_AC4:      equ    4                                         ; Acceptance Code Bit 4
+CAN1IDAR5_AC5:      equ    5                                         ; Acceptance Code Bit 5
+CAN1IDAR5_AC6:      equ    6                                         ; Acceptance Code Bit 6
+CAN1IDAR5_AC7:      equ    7                                         ; Acceptance Code Bit 7
+; bit position masks
+mCAN1IDAR5_AC0:     equ    %00000001
+mCAN1IDAR5_AC1:     equ    %00000010
+mCAN1IDAR5_AC2:     equ    %00000100
+mCAN1IDAR5_AC3:     equ    %00001000
+mCAN1IDAR5_AC4:     equ    %00010000
+mCAN1IDAR5_AC5:     equ    %00100000
+mCAN1IDAR5_AC6:     equ    %01000000
+mCAN1IDAR5_AC7:     equ    %10000000
+
+
+;*** CAN1IDAR6 - MSCAN 1 Identifier Acceptance Register 6; 0x0000019A ***
+CAN1IDAR6:          equ    $0000019A                                ;*** CAN1IDAR6 - MSCAN 1 Identifier Acceptance Register 6; 0x0000019A ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1IDAR6_AC0:      equ    0                                         ; Acceptance Code Bit 0
+CAN1IDAR6_AC1:      equ    1                                         ; Acceptance Code Bit 1
+CAN1IDAR6_AC2:      equ    2                                         ; Acceptance Code Bit 2
+CAN1IDAR6_AC3:      equ    3                                         ; Acceptance Code Bit 3
+CAN1IDAR6_AC4:      equ    4                                         ; Acceptance Code Bit 4
+CAN1IDAR6_AC5:      equ    5                                         ; Acceptance Code Bit 5
+CAN1IDAR6_AC6:      equ    6                                         ; Acceptance Code Bit 6
+CAN1IDAR6_AC7:      equ    7                                         ; Acceptance Code Bit 7
+; bit position masks
+mCAN1IDAR6_AC0:     equ    %00000001
+mCAN1IDAR6_AC1:     equ    %00000010
+mCAN1IDAR6_AC2:     equ    %00000100
+mCAN1IDAR6_AC3:     equ    %00001000
+mCAN1IDAR6_AC4:     equ    %00010000
+mCAN1IDAR6_AC5:     equ    %00100000
+mCAN1IDAR6_AC6:     equ    %01000000
+mCAN1IDAR6_AC7:     equ    %10000000
+
+
+;*** CAN1IDAR7 - MSCAN 1 Identifier Acceptance Register 7; 0x0000019B ***
+CAN1IDAR7:          equ    $0000019B                                ;*** CAN1IDAR7 - MSCAN 1 Identifier Acceptance Register 7; 0x0000019B ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1IDAR7_AC0:      equ    0                                         ; Acceptance Code Bit 0
+CAN1IDAR7_AC1:      equ    1                                         ; Acceptance Code Bit 1
+CAN1IDAR7_AC2:      equ    2                                         ; Acceptance Code Bit 2
+CAN1IDAR7_AC3:      equ    3                                         ; Acceptance Code Bit 3
+CAN1IDAR7_AC4:      equ    4                                         ; Acceptance Code Bit 4
+CAN1IDAR7_AC5:      equ    5                                         ; Acceptance Code Bit 5
+CAN1IDAR7_AC6:      equ    6                                         ; Acceptance Code Bit 6
+CAN1IDAR7_AC7:      equ    7                                         ; Acceptance Code Bit 7
+; bit position masks
+mCAN1IDAR7_AC0:     equ    %00000001
+mCAN1IDAR7_AC1:     equ    %00000010
+mCAN1IDAR7_AC2:     equ    %00000100
+mCAN1IDAR7_AC3:     equ    %00001000
+mCAN1IDAR7_AC4:     equ    %00010000
+mCAN1IDAR7_AC5:     equ    %00100000
+mCAN1IDAR7_AC6:     equ    %01000000
+mCAN1IDAR7_AC7:     equ    %10000000
+
+
+;*** CAN1IDMR4 - MSCAN 1 Identifier Mask Register 4; 0x0000019C ***
+CAN1IDMR4:          equ    $0000019C                                ;*** CAN1IDMR4 - MSCAN 1 Identifier Mask Register 4; 0x0000019C ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1IDMR4_AM0:      equ    0                                         ; Acceptance Mask Bit 0
+CAN1IDMR4_AM1:      equ    1                                         ; Acceptance Mask Bit 1
+CAN1IDMR4_AM2:      equ    2                                         ; Acceptance Mask Bit 2
+CAN1IDMR4_AM3:      equ    3                                         ; Acceptance Mask Bit 3
+CAN1IDMR4_AM4:      equ    4                                         ; Acceptance Mask Bit 4
+CAN1IDMR4_AM5:      equ    5                                         ; Acceptance Mask Bit 5
+CAN1IDMR4_AM6:      equ    6                                         ; Acceptance Mask Bit 6
+CAN1IDMR4_AM7:      equ    7                                         ; Acceptance Mask Bit 7
+; bit position masks
+mCAN1IDMR4_AM0:     equ    %00000001
+mCAN1IDMR4_AM1:     equ    %00000010
+mCAN1IDMR4_AM2:     equ    %00000100
+mCAN1IDMR4_AM3:     equ    %00001000
+mCAN1IDMR4_AM4:     equ    %00010000
+mCAN1IDMR4_AM5:     equ    %00100000
+mCAN1IDMR4_AM6:     equ    %01000000
+mCAN1IDMR4_AM7:     equ    %10000000
+
+
+;*** CAN1IDMR5 - MSCAN 1 Identifier Mask Register 5; 0x0000019D ***
+CAN1IDMR5:          equ    $0000019D                                ;*** CAN1IDMR5 - MSCAN 1 Identifier Mask Register 5; 0x0000019D ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1IDMR5_AM0:      equ    0                                         ; Acceptance Mask Bit 0
+CAN1IDMR5_AM1:      equ    1                                         ; Acceptance Mask Bit 1
+CAN1IDMR5_AM2:      equ    2                                         ; Acceptance Mask Bit 2
+CAN1IDMR5_AM3:      equ    3                                         ; Acceptance Mask Bit 3
+CAN1IDMR5_AM4:      equ    4                                         ; Acceptance Mask Bit 4
+CAN1IDMR5_AM5:      equ    5                                         ; Acceptance Mask Bit 5
+CAN1IDMR5_AM6:      equ    6                                         ; Acceptance Mask Bit 6
+CAN1IDMR5_AM7:      equ    7                                         ; Acceptance Mask Bit 7
+; bit position masks
+mCAN1IDMR5_AM0:     equ    %00000001
+mCAN1IDMR5_AM1:     equ    %00000010
+mCAN1IDMR5_AM2:     equ    %00000100
+mCAN1IDMR5_AM3:     equ    %00001000
+mCAN1IDMR5_AM4:     equ    %00010000
+mCAN1IDMR5_AM5:     equ    %00100000
+mCAN1IDMR5_AM6:     equ    %01000000
+mCAN1IDMR5_AM7:     equ    %10000000
+
+
+;*** CAN1IDMR6 - MSCAN 1 Identifier Mask Register 6; 0x0000019E ***
+CAN1IDMR6:          equ    $0000019E                                ;*** CAN1IDMR6 - MSCAN 1 Identifier Mask Register 6; 0x0000019E ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1IDMR6_AM0:      equ    0                                         ; Acceptance Mask Bit 0
+CAN1IDMR6_AM1:      equ    1                                         ; Acceptance Mask Bit 1
+CAN1IDMR6_AM2:      equ    2                                         ; Acceptance Mask Bit 2
+CAN1IDMR6_AM3:      equ    3                                         ; Acceptance Mask Bit 3
+CAN1IDMR6_AM4:      equ    4                                         ; Acceptance Mask Bit 4
+CAN1IDMR6_AM5:      equ    5                                         ; Acceptance Mask Bit 5
+CAN1IDMR6_AM6:      equ    6                                         ; Acceptance Mask Bit 6
+CAN1IDMR6_AM7:      equ    7                                         ; Acceptance Mask Bit 7
+; bit position masks
+mCAN1IDMR6_AM0:     equ    %00000001
+mCAN1IDMR6_AM1:     equ    %00000010
+mCAN1IDMR6_AM2:     equ    %00000100
+mCAN1IDMR6_AM3:     equ    %00001000
+mCAN1IDMR6_AM4:     equ    %00010000
+mCAN1IDMR6_AM5:     equ    %00100000
+mCAN1IDMR6_AM6:     equ    %01000000
+mCAN1IDMR6_AM7:     equ    %10000000
+
+
+;*** CAN1IDMR7 - MSCAN 1 Identifier Mask Register 7; 0x0000019F ***
+CAN1IDMR7:          equ    $0000019F                                ;*** CAN1IDMR7 - MSCAN 1 Identifier Mask Register 7; 0x0000019F ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1IDMR7_AM0:      equ    0                                         ; Acceptance Mask Bit 0
+CAN1IDMR7_AM1:      equ    1                                         ; Acceptance Mask Bit 1
+CAN1IDMR7_AM2:      equ    2                                         ; Acceptance Mask Bit 2
+CAN1IDMR7_AM3:      equ    3                                         ; Acceptance Mask Bit 3
+CAN1IDMR7_AM4:      equ    4                                         ; Acceptance Mask Bit 4
+CAN1IDMR7_AM5:      equ    5                                         ; Acceptance Mask Bit 5
+CAN1IDMR7_AM6:      equ    6                                         ; Acceptance Mask Bit 6
+CAN1IDMR7_AM7:      equ    7                                         ; Acceptance Mask Bit 7
+; bit position masks
+mCAN1IDMR7_AM0:     equ    %00000001
+mCAN1IDMR7_AM1:     equ    %00000010
+mCAN1IDMR7_AM2:     equ    %00000100
+mCAN1IDMR7_AM3:     equ    %00001000
+mCAN1IDMR7_AM4:     equ    %00010000
+mCAN1IDMR7_AM5:     equ    %00100000
+mCAN1IDMR7_AM6:     equ    %01000000
+mCAN1IDMR7_AM7:     equ    %10000000
+
+
+;*** CAN1RXIDR0 - MSCAN 1 Receive Identifier Register 0; 0x000001A0 ***
+CAN1RXIDR0:         equ    $000001A0                                ;*** CAN1RXIDR0 - MSCAN 1 Receive Identifier Register 0; 0x000001A0 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1RXIDR0_ID21:    equ    0                                         ; Extended format identifier Bit 21
+CAN1RXIDR0_ID22:    equ    1                                         ; Extended format identifier Bit 22
+CAN1RXIDR0_ID23:    equ    2                                         ; Extended format identifier Bit 23
+CAN1RXIDR0_ID24:    equ    3                                         ; Extended format identifier Bit 24
+CAN1RXIDR0_ID25:    equ    4                                         ; Extended format identifier Bit 25
+CAN1RXIDR0_ID26:    equ    5                                         ; Extended format identifier Bit 26
+CAN1RXIDR0_ID27:    equ    6                                         ; Extended format identifier Bit 27
+CAN1RXIDR0_ID28:    equ    7                                         ; Extended format identifier Bit 28
+; bit position masks
+mCAN1RXIDR0_ID21:   equ    %00000001
+mCAN1RXIDR0_ID22:   equ    %00000010
+mCAN1RXIDR0_ID23:   equ    %00000100
+mCAN1RXIDR0_ID24:   equ    %00001000
+mCAN1RXIDR0_ID25:   equ    %00010000
+mCAN1RXIDR0_ID26:   equ    %00100000
+mCAN1RXIDR0_ID27:   equ    %01000000
+mCAN1RXIDR0_ID28:   equ    %10000000
+
+
+;*** CAN1RXIDR1 - MSCAN 1 Receive Identifier Register 1; 0x000001A1 ***
+CAN1RXIDR1:         equ    $000001A1                                ;*** CAN1RXIDR1 - MSCAN 1 Receive Identifier Register 1; 0x000001A1 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1RXIDR1_ID15:    equ    0                                         ; Extended format identifier Bit 15
+CAN1RXIDR1_ID16:    equ    1                                         ; Extended format identifier Bit 16
+CAN1RXIDR1_ID17:    equ    2                                         ; Extended format identifier Bit 17
+CAN1RXIDR1_IDE:     equ    3                                         ; ID Extended
+CAN1RXIDR1_SRR:     equ    4                                         ; Substitute Remote Request
+CAN1RXIDR1_ID18:    equ    5                                         ; Extended format identifier Bit 18
+CAN1RXIDR1_ID19:    equ    6                                         ; Extended format identifier Bit 19
+CAN1RXIDR1_ID20:    equ    7                                         ; Extended format identifier Bit 20
+; bit position masks
+mCAN1RXIDR1_ID15:   equ    %00000001
+mCAN1RXIDR1_ID16:   equ    %00000010
+mCAN1RXIDR1_ID17:   equ    %00000100
+mCAN1RXIDR1_IDE:    equ    %00001000
+mCAN1RXIDR1_SRR:    equ    %00010000
+mCAN1RXIDR1_ID18:   equ    %00100000
+mCAN1RXIDR1_ID19:   equ    %01000000
+mCAN1RXIDR1_ID20:   equ    %10000000
+
+
+;*** CAN1RXIDR2 - MSCAN 1 Receive Identifier Register 2; 0x000001A2 ***
+CAN1RXIDR2:         equ    $000001A2                                ;*** CAN1RXIDR2 - MSCAN 1 Receive Identifier Register 2; 0x000001A2 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1RXIDR2_ID7:     equ    0                                         ; Extended format identifier Bit 7
+CAN1RXIDR2_ID8:     equ    1                                         ; Extended format identifier Bit 8
+CAN1RXIDR2_ID9:     equ    2                                         ; Extended format identifier Bit 9
+CAN1RXIDR2_ID10:    equ    3                                         ; Extended format identifier Bit 10
+CAN1RXIDR2_ID11:    equ    4                                         ; Extended format identifier Bit 11
+CAN1RXIDR2_ID12:    equ    5                                         ; Extended format identifier Bit 12
+CAN1RXIDR2_ID13:    equ    6                                         ; Extended format identifier Bit 13
+CAN1RXIDR2_ID14:    equ    7                                         ; Extended format identifier Bit 14
+; bit position masks
+mCAN1RXIDR2_ID7:    equ    %00000001
+mCAN1RXIDR2_ID8:    equ    %00000010
+mCAN1RXIDR2_ID9:    equ    %00000100
+mCAN1RXIDR2_ID10:   equ    %00001000
+mCAN1RXIDR2_ID11:   equ    %00010000
+mCAN1RXIDR2_ID12:   equ    %00100000
+mCAN1RXIDR2_ID13:   equ    %01000000
+mCAN1RXIDR2_ID14:   equ    %10000000
+
+
+;*** CAN1RXIDR3 - MSCAN 1 Receive Identifier Register 3; 0x000001A3 ***
+CAN1RXIDR3:         equ    $000001A3                                ;*** CAN1RXIDR3 - MSCAN 1 Receive Identifier Register 3; 0x000001A3 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1RXIDR3_RTR:     equ    0                                         ; Remote Transmission Request
+CAN1RXIDR3_ID0:     equ    1                                         ; Extended format identifier Bit 0
+CAN1RXIDR3_ID1:     equ    2                                         ; Extended format identifier Bit 1
+CAN1RXIDR3_ID2:     equ    3                                         ; Extended format identifier Bit 2
+CAN1RXIDR3_ID3:     equ    4                                         ; Extended format identifier Bit 3
+CAN1RXIDR3_ID4:     equ    5                                         ; Extended format identifier Bit 4
+CAN1RXIDR3_ID5:     equ    6                                         ; Extended format identifier Bit 5
+CAN1RXIDR3_ID6:     equ    7                                         ; Extended format identifier Bit 6
+; bit position masks
+mCAN1RXIDR3_RTR:    equ    %00000001
+mCAN1RXIDR3_ID0:    equ    %00000010
+mCAN1RXIDR3_ID1:    equ    %00000100
+mCAN1RXIDR3_ID2:    equ    %00001000
+mCAN1RXIDR3_ID3:    equ    %00010000
+mCAN1RXIDR3_ID4:    equ    %00100000
+mCAN1RXIDR3_ID5:    equ    %01000000
+mCAN1RXIDR3_ID6:    equ    %10000000
+
+
+;*** CAN1RXDSR0 - MSCAN 1 Receive Data Segment Register 0; 0x000001A4 ***
+CAN1RXDSR0:         equ    $000001A4                                ;*** CAN1RXDSR0 - MSCAN 1 Receive Data Segment Register 0; 0x000001A4 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1RXDSR0_DB0:     equ    0                                         ; Data Bit 0
+CAN1RXDSR0_DB1:     equ    1                                         ; Data Bit 1
+CAN1RXDSR0_DB2:     equ    2                                         ; Data Bit 2
+CAN1RXDSR0_DB3:     equ    3                                         ; Data Bit 3
+CAN1RXDSR0_DB4:     equ    4                                         ; Data Bit 4
+CAN1RXDSR0_DB5:     equ    5                                         ; Data Bit 5
+CAN1RXDSR0_DB6:     equ    6                                         ; Data Bit 6
+CAN1RXDSR0_DB7:     equ    7                                         ; Data Bit 7
+; bit position masks
+mCAN1RXDSR0_DB0:    equ    %00000001
+mCAN1RXDSR0_DB1:    equ    %00000010
+mCAN1RXDSR0_DB2:    equ    %00000100
+mCAN1RXDSR0_DB3:    equ    %00001000
+mCAN1RXDSR0_DB4:    equ    %00010000
+mCAN1RXDSR0_DB5:    equ    %00100000
+mCAN1RXDSR0_DB6:    equ    %01000000
+mCAN1RXDSR0_DB7:    equ    %10000000
+
+
+;*** CAN1RXDSR1 - MSCAN 1 Receive Data Segment Register 1; 0x000001A5 ***
+CAN1RXDSR1:         equ    $000001A5                                ;*** CAN1RXDSR1 - MSCAN 1 Receive Data Segment Register 1; 0x000001A5 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1RXDSR1_DB0:     equ    0                                         ; Data Bit 0
+CAN1RXDSR1_DB1:     equ    1                                         ; Data Bit 1
+CAN1RXDSR1_DB2:     equ    2                                         ; Data Bit 2
+CAN1RXDSR1_DB3:     equ    3                                         ; Data Bit 3
+CAN1RXDSR1_DB4:     equ    4                                         ; Data Bit 4
+CAN1RXDSR1_DB5:     equ    5                                         ; Data Bit 5
+CAN1RXDSR1_DB6:     equ    6                                         ; Data Bit 6
+CAN1RXDSR1_DB7:     equ    7                                         ; Data Bit 7
+; bit position masks
+mCAN1RXDSR1_DB0:    equ    %00000001
+mCAN1RXDSR1_DB1:    equ    %00000010
+mCAN1RXDSR1_DB2:    equ    %00000100
+mCAN1RXDSR1_DB3:    equ    %00001000
+mCAN1RXDSR1_DB4:    equ    %00010000
+mCAN1RXDSR1_DB5:    equ    %00100000
+mCAN1RXDSR1_DB6:    equ    %01000000
+mCAN1RXDSR1_DB7:    equ    %10000000
+
+
+;*** CAN1RXDSR2 - MSCAN 1 Receive Data Segment Register 2; 0x000001A6 ***
+CAN1RXDSR2:         equ    $000001A6                                ;*** CAN1RXDSR2 - MSCAN 1 Receive Data Segment Register 2; 0x000001A6 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1RXDSR2_DB0:     equ    0                                         ; Data Bit 0
+CAN1RXDSR2_DB1:     equ    1                                         ; Data Bit 1
+CAN1RXDSR2_DB2:     equ    2                                         ; Data Bit 2
+CAN1RXDSR2_DB3:     equ    3                                         ; Data Bit 3
+CAN1RXDSR2_DB4:     equ    4                                         ; Data Bit 4
+CAN1RXDSR2_DB5:     equ    5                                         ; Data Bit 5
+CAN1RXDSR2_DB6:     equ    6                                         ; Data Bit 6
+CAN1RXDSR2_DB7:     equ    7                                         ; Data Bit 7
+; bit position masks
+mCAN1RXDSR2_DB0:    equ    %00000001
+mCAN1RXDSR2_DB1:    equ    %00000010
+mCAN1RXDSR2_DB2:    equ    %00000100
+mCAN1RXDSR2_DB3:    equ    %00001000
+mCAN1RXDSR2_DB4:    equ    %00010000
+mCAN1RXDSR2_DB5:    equ    %00100000
+mCAN1RXDSR2_DB6:    equ    %01000000
+mCAN1RXDSR2_DB7:    equ    %10000000
+
+
+;*** CAN1RXDSR3 - MSCAN 1 Receive Data Segment Register 3; 0x000001A7 ***
+CAN1RXDSR3:         equ    $000001A7                                ;*** CAN1RXDSR3 - MSCAN 1 Receive Data Segment Register 3; 0x000001A7 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1RXDSR3_DB0:     equ    0                                         ; Data Bit 0
+CAN1RXDSR3_DB1:     equ    1                                         ; Data Bit 1
+CAN1RXDSR3_DB2:     equ    2                                         ; Data Bit 2
+CAN1RXDSR3_DB3:     equ    3                                         ; Data Bit 3
+CAN1RXDSR3_DB4:     equ    4                                         ; Data Bit 4
+CAN1RXDSR3_DB5:     equ    5                                         ; Data Bit 5
+CAN1RXDSR3_DB6:     equ    6                                         ; Data Bit 6
+CAN1RXDSR3_DB7:     equ    7                                         ; Data Bit 7
+; bit position masks
+mCAN1RXDSR3_DB0:    equ    %00000001
+mCAN1RXDSR3_DB1:    equ    %00000010
+mCAN1RXDSR3_DB2:    equ    %00000100
+mCAN1RXDSR3_DB3:    equ    %00001000
+mCAN1RXDSR3_DB4:    equ    %00010000
+mCAN1RXDSR3_DB5:    equ    %00100000
+mCAN1RXDSR3_DB6:    equ    %01000000
+mCAN1RXDSR3_DB7:    equ    %10000000
+
+
+;*** CAN1RXDSR4 - MSCAN 1 Receive Data Segment Register 4; 0x000001A8 ***
+CAN1RXDSR4:         equ    $000001A8                                ;*** CAN1RXDSR4 - MSCAN 1 Receive Data Segment Register 4; 0x000001A8 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1RXDSR4_DB0:     equ    0                                         ; Data Bit 0
+CAN1RXDSR4_DB1:     equ    1                                         ; Data Bit 1
+CAN1RXDSR4_DB2:     equ    2                                         ; Data Bit 2
+CAN1RXDSR4_DB3:     equ    3                                         ; Data Bit 3
+CAN1RXDSR4_DB4:     equ    4                                         ; Data Bit 4
+CAN1RXDSR4_DB5:     equ    5                                         ; Data Bit 5
+CAN1RXDSR4_DB6:     equ    6                                         ; Data Bit 6
+CAN1RXDSR4_DB7:     equ    7                                         ; Data Bit 7
+; bit position masks
+mCAN1RXDSR4_DB0:    equ    %00000001
+mCAN1RXDSR4_DB1:    equ    %00000010
+mCAN1RXDSR4_DB2:    equ    %00000100
+mCAN1RXDSR4_DB3:    equ    %00001000
+mCAN1RXDSR4_DB4:    equ    %00010000
+mCAN1RXDSR4_DB5:    equ    %00100000
+mCAN1RXDSR4_DB6:    equ    %01000000
+mCAN1RXDSR4_DB7:    equ    %10000000
+
+
+;*** CAN1RXDSR5 - MSCAN 1 Receive Data Segment Register 5; 0x000001A9 ***
+CAN1RXDSR5:         equ    $000001A9                                ;*** CAN1RXDSR5 - MSCAN 1 Receive Data Segment Register 5; 0x000001A9 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1RXDSR5_DB0:     equ    0                                         ; Data Bit 0
+CAN1RXDSR5_DB1:     equ    1                                         ; Data Bit 1
+CAN1RXDSR5_DB2:     equ    2                                         ; Data Bit 2
+CAN1RXDSR5_DB3:     equ    3                                         ; Data Bit 3
+CAN1RXDSR5_DB4:     equ    4                                         ; Data Bit 4
+CAN1RXDSR5_DB5:     equ    5                                         ; Data Bit 5
+CAN1RXDSR5_DB6:     equ    6                                         ; Data Bit 6
+CAN1RXDSR5_DB7:     equ    7                                         ; Data Bit 7
+; bit position masks
+mCAN1RXDSR5_DB0:    equ    %00000001
+mCAN1RXDSR5_DB1:    equ    %00000010
+mCAN1RXDSR5_DB2:    equ    %00000100
+mCAN1RXDSR5_DB3:    equ    %00001000
+mCAN1RXDSR5_DB4:    equ    %00010000
+mCAN1RXDSR5_DB5:    equ    %00100000
+mCAN1RXDSR5_DB6:    equ    %01000000
+mCAN1RXDSR5_DB7:    equ    %10000000
+
+
+;*** CAN1RXDSR6 - MSCAN 1 Receive Data Segment Register 6; 0x000001AA ***
+CAN1RXDSR6:         equ    $000001AA                                ;*** CAN1RXDSR6 - MSCAN 1 Receive Data Segment Register 6; 0x000001AA ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1RXDSR6_DB0:     equ    0                                         ; Data Bit 0
+CAN1RXDSR6_DB1:     equ    1                                         ; Data Bit 1
+CAN1RXDSR6_DB2:     equ    2                                         ; Data Bit 2
+CAN1RXDSR6_DB3:     equ    3                                         ; Data Bit 3
+CAN1RXDSR6_DB4:     equ    4                                         ; Data Bit 4
+CAN1RXDSR6_DB5:     equ    5                                         ; Data Bit 5
+CAN1RXDSR6_DB6:     equ    6                                         ; Data Bit 6
+CAN1RXDSR6_DB7:     equ    7                                         ; Data Bit 7
+; bit position masks
+mCAN1RXDSR6_DB0:    equ    %00000001
+mCAN1RXDSR6_DB1:    equ    %00000010
+mCAN1RXDSR6_DB2:    equ    %00000100
+mCAN1RXDSR6_DB3:    equ    %00001000
+mCAN1RXDSR6_DB4:    equ    %00010000
+mCAN1RXDSR6_DB5:    equ    %00100000
+mCAN1RXDSR6_DB6:    equ    %01000000
+mCAN1RXDSR6_DB7:    equ    %10000000
+
+
+;*** CAN1RXDSR7 - MSCAN 1 Receive Data Segment Register 7; 0x000001AB ***
+CAN1RXDSR7:         equ    $000001AB                                ;*** CAN1RXDSR7 - MSCAN 1 Receive Data Segment Register 7; 0x000001AB ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1RXDSR7_DB0:     equ    0                                         ; Data Bit 0
+CAN1RXDSR7_DB1:     equ    1                                         ; Data Bit 1
+CAN1RXDSR7_DB2:     equ    2                                         ; Data Bit 2
+CAN1RXDSR7_DB3:     equ    3                                         ; Data Bit 3
+CAN1RXDSR7_DB4:     equ    4                                         ; Data Bit 4
+CAN1RXDSR7_DB5:     equ    5                                         ; Data Bit 5
+CAN1RXDSR7_DB6:     equ    6                                         ; Data Bit 6
+CAN1RXDSR7_DB7:     equ    7                                         ; Data Bit 7
+; bit position masks
+mCAN1RXDSR7_DB0:    equ    %00000001
+mCAN1RXDSR7_DB1:    equ    %00000010
+mCAN1RXDSR7_DB2:    equ    %00000100
+mCAN1RXDSR7_DB3:    equ    %00001000
+mCAN1RXDSR7_DB4:    equ    %00010000
+mCAN1RXDSR7_DB5:    equ    %00100000
+mCAN1RXDSR7_DB6:    equ    %01000000
+mCAN1RXDSR7_DB7:    equ    %10000000
+
+
+;*** CAN1RXDLR - MSCAN 1 Receive Data Length Register; 0x000001AC ***
+CAN1RXDLR:          equ    $000001AC                                ;*** CAN1RXDLR - MSCAN 1 Receive Data Length Register; 0x000001AC ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1RXDLR_DLC0:     equ    0                                         ; Data Length Code Bit 0
+CAN1RXDLR_DLC1:     equ    1                                         ; Data Length Code Bit 1
+CAN1RXDLR_DLC2:     equ    2                                         ; Data Length Code Bit 2
+CAN1RXDLR_DLC3:     equ    3                                         ; Data Length Code Bit 3
+; bit position masks
+mCAN1RXDLR_DLC0:    equ    %00000001
+mCAN1RXDLR_DLC1:    equ    %00000010
+mCAN1RXDLR_DLC2:    equ    %00000100
+mCAN1RXDLR_DLC3:    equ    %00001000
+
+
+;*** CAN1RXTSR - MSCAN 1 Receive Time Stamp Register; 0x000001AE ***
+CAN1RXTSR:          equ    $000001AE                                ;*** CAN1RXTSR - MSCAN 1 Receive Time Stamp Register; 0x000001AE ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1RXTSR_TSR0:     equ    0                                         ; Time Stamp Bit 0
+CAN1RXTSR_TSR1:     equ    1                                         ; Time Stamp Bit 1
+CAN1RXTSR_TSR2:     equ    2                                         ; Time Stamp Bit 2
+CAN1RXTSR_TSR3:     equ    3                                         ; Time Stamp Bit 3
+CAN1RXTSR_TSR4:     equ    4                                         ; Time Stamp Bit 4
+CAN1RXTSR_TSR5:     equ    5                                         ; Time Stamp Bit 5
+CAN1RXTSR_TSR6:     equ    6                                         ; Time Stamp Bit 6
+CAN1RXTSR_TSR7:     equ    7                                         ; Time Stamp Bit 7
+CAN1RXTSR_TSR8:     equ    8                                         ; Time Stamp Bit 8
+CAN1RXTSR_TSR9:     equ    9                                         ; Time Stamp Bit 9
+CAN1RXTSR_TSR10:    equ    10                                        ; Time Stamp Bit 10
+CAN1RXTSR_TSR11:    equ    11                                        ; Time Stamp Bit 11
+CAN1RXTSR_TSR12:    equ    12                                        ; Time Stamp Bit 12
+CAN1RXTSR_TSR13:    equ    13                                        ; Time Stamp Bit 13
+CAN1RXTSR_TSR14:    equ    14                                        ; Time Stamp Bit 14
+CAN1RXTSR_TSR15:    equ    15                                        ; Time Stamp Bit 15
+; bit position masks
+mCAN1RXTSR_TSR0:    equ    %00000001
+mCAN1RXTSR_TSR1:    equ    %00000010
+mCAN1RXTSR_TSR2:    equ    %00000100
+mCAN1RXTSR_TSR3:    equ    %00001000
+mCAN1RXTSR_TSR4:    equ    %00010000
+mCAN1RXTSR_TSR5:    equ    %00100000
+mCAN1RXTSR_TSR6:    equ    %01000000
+mCAN1RXTSR_TSR7:    equ    %10000000
+mCAN1RXTSR_TSR8:    equ    %100000000
+mCAN1RXTSR_TSR9:    equ    %1000000000
+mCAN1RXTSR_TSR10:   equ    %10000000000
+mCAN1RXTSR_TSR11:   equ    %100000000000
+mCAN1RXTSR_TSR12:   equ    %1000000000000
+mCAN1RXTSR_TSR13:   equ    %10000000000000
+mCAN1RXTSR_TSR14:   equ    %100000000000000
+mCAN1RXTSR_TSR15:   equ    %1000000000000000
+
+
+;*** CAN1RXTSRH - MSCAN 1 Receive Time Stamp Register High; 0x000001AE ***
+CAN1RXTSRH:         equ    $000001AE                                ;*** CAN1RXTSRH - MSCAN 1 Receive Time Stamp Register High; 0x000001AE ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1RXTSRH_TSR8:    equ    0                                         ; Time Stamp Bit 8
+CAN1RXTSRH_TSR9:    equ    1                                         ; Time Stamp Bit 9
+CAN1RXTSRH_TSR10:   equ    2                                         ; Time Stamp Bit 10
+CAN1RXTSRH_TSR11:   equ    3                                         ; Time Stamp Bit 11
+CAN1RXTSRH_TSR12:   equ    4                                         ; Time Stamp Bit 12
+CAN1RXTSRH_TSR13:   equ    5                                         ; Time Stamp Bit 13
+CAN1RXTSRH_TSR14:   equ    6                                         ; Time Stamp Bit 14
+CAN1RXTSRH_TSR15:   equ    7                                         ; Time Stamp Bit 15
+; bit position masks
+mCAN1RXTSRH_TSR8:   equ    %00000001
+mCAN1RXTSRH_TSR9:   equ    %00000010
+mCAN1RXTSRH_TSR10:  equ    %00000100
+mCAN1RXTSRH_TSR11:  equ    %00001000
+mCAN1RXTSRH_TSR12:  equ    %00010000
+mCAN1RXTSRH_TSR13:  equ    %00100000
+mCAN1RXTSRH_TSR14:  equ    %01000000
+mCAN1RXTSRH_TSR15:  equ    %10000000
+
+
+;*** CAN1RXTSRL - MSCAN 1 Receive Time Stamp Register Low; 0x000001AF ***
+CAN1RXTSRL:         equ    $000001AF                                ;*** CAN1RXTSRL - MSCAN 1 Receive Time Stamp Register Low; 0x000001AF ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1RXTSRL_TSR0:    equ    0                                         ; Time Stamp Bit 0
+CAN1RXTSRL_TSR1:    equ    1                                         ; Time Stamp Bit 1
+CAN1RXTSRL_TSR2:    equ    2                                         ; Time Stamp Bit 2
+CAN1RXTSRL_TSR3:    equ    3                                         ; Time Stamp Bit 3
+CAN1RXTSRL_TSR4:    equ    4                                         ; Time Stamp Bit 4
+CAN1RXTSRL_TSR5:    equ    5                                         ; Time Stamp Bit 5
+CAN1RXTSRL_TSR6:    equ    6                                         ; Time Stamp Bit 6
+CAN1RXTSRL_TSR7:    equ    7                                         ; Time Stamp Bit 7
+; bit position masks
+mCAN1RXTSRL_TSR0:   equ    %00000001
+mCAN1RXTSRL_TSR1:   equ    %00000010
+mCAN1RXTSRL_TSR2:   equ    %00000100
+mCAN1RXTSRL_TSR3:   equ    %00001000
+mCAN1RXTSRL_TSR4:   equ    %00010000
+mCAN1RXTSRL_TSR5:   equ    %00100000
+mCAN1RXTSRL_TSR6:   equ    %01000000
+mCAN1RXTSRL_TSR7:   equ    %10000000
+
+
+;*** CAN1TXIDR0 - MSCAN 1 Transmit Identifier Register 0; 0x000001B0 ***
+CAN1TXIDR0:         equ    $000001B0                                ;*** CAN1TXIDR0 - MSCAN 1 Transmit Identifier Register 0; 0x000001B0 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1TXIDR0_ID21:    equ    0                                         ; Extended format identifier Bit 21
+CAN1TXIDR0_ID22:    equ    1                                         ; Extended format identifier Bit 22
+CAN1TXIDR0_ID23:    equ    2                                         ; Extended format identifier Bit 23
+CAN1TXIDR0_ID24:    equ    3                                         ; Extended format identifier Bit 24
+CAN1TXIDR0_ID25:    equ    4                                         ; Extended format identifier Bit 25
+CAN1TXIDR0_ID26:    equ    5                                         ; Extended format identifier Bit 26
+CAN1TXIDR0_ID27:    equ    6                                         ; Extended format identifier Bit 27
+CAN1TXIDR0_ID28:    equ    7                                         ; Extended format identifier Bit 28
+; bit position masks
+mCAN1TXIDR0_ID21:   equ    %00000001
+mCAN1TXIDR0_ID22:   equ    %00000010
+mCAN1TXIDR0_ID23:   equ    %00000100
+mCAN1TXIDR0_ID24:   equ    %00001000
+mCAN1TXIDR0_ID25:   equ    %00010000
+mCAN1TXIDR0_ID26:   equ    %00100000
+mCAN1TXIDR0_ID27:   equ    %01000000
+mCAN1TXIDR0_ID28:   equ    %10000000
+
+
+;*** CAN1TXIDR1 - MSCAN 1 Transmit Identifier Register 1; 0x000001B1 ***
+CAN1TXIDR1:         equ    $000001B1                                ;*** CAN1TXIDR1 - MSCAN 1 Transmit Identifier Register 1; 0x000001B1 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1TXIDR1_ID15:    equ    0                                         ; Extended format identifier Bit 15
+CAN1TXIDR1_ID16:    equ    1                                         ; Extended format identifier Bit 16
+CAN1TXIDR1_ID17:    equ    2                                         ; Extended format identifier Bit 17
+CAN1TXIDR1_IDE:     equ    3                                         ; ID Extended
+CAN1TXIDR1_SRR:     equ    4                                         ; Substitute Remote Request
+CAN1TXIDR1_ID18:    equ    5                                         ; Extended format identifier Bit 18
+CAN1TXIDR1_ID19:    equ    6                                         ; Extended format identifier Bit 19
+CAN1TXIDR1_ID20:    equ    7                                         ; Extended format identifier Bit 20
+; bit position masks
+mCAN1TXIDR1_ID15:   equ    %00000001
+mCAN1TXIDR1_ID16:   equ    %00000010
+mCAN1TXIDR1_ID17:   equ    %00000100
+mCAN1TXIDR1_IDE:    equ    %00001000
+mCAN1TXIDR1_SRR:    equ    %00010000
+mCAN1TXIDR1_ID18:   equ    %00100000
+mCAN1TXIDR1_ID19:   equ    %01000000
+mCAN1TXIDR1_ID20:   equ    %10000000
+
+
+;*** CAN1TXIDR2 - MSCAN 1 Transmit Identifier Register 2; 0x000001B2 ***
+CAN1TXIDR2:         equ    $000001B2                                ;*** CAN1TXIDR2 - MSCAN 1 Transmit Identifier Register 2; 0x000001B2 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1TXIDR2_ID7:     equ    0                                         ; Extended format identifier Bit 7
+CAN1TXIDR2_ID8:     equ    1                                         ; Extended format identifier Bit 8
+CAN1TXIDR2_ID9:     equ    2                                         ; Extended format identifier Bit 9
+CAN1TXIDR2_ID10:    equ    3                                         ; Extended format identifier Bit 10
+CAN1TXIDR2_ID11:    equ    4                                         ; Extended format identifier Bit 11
+CAN1TXIDR2_ID12:    equ    5                                         ; Extended format identifier Bit 12
+CAN1TXIDR2_ID13:    equ    6                                         ; Extended format identifier Bit 13
+CAN1TXIDR2_ID14:    equ    7                                         ; Extended format identifier Bit 14
+; bit position masks
+mCAN1TXIDR2_ID7:    equ    %00000001
+mCAN1TXIDR2_ID8:    equ    %00000010
+mCAN1TXIDR2_ID9:    equ    %00000100
+mCAN1TXIDR2_ID10:   equ    %00001000
+mCAN1TXIDR2_ID11:   equ    %00010000
+mCAN1TXIDR2_ID12:   equ    %00100000
+mCAN1TXIDR2_ID13:   equ    %01000000
+mCAN1TXIDR2_ID14:   equ    %10000000
+
+
+;*** CAN1TXIDR3 - MSCAN 1 Transmit Identifier Register 3; 0x000001B3 ***
+CAN1TXIDR3:         equ    $000001B3                                ;*** CAN1TXIDR3 - MSCAN 1 Transmit Identifier Register 3; 0x000001B3 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1TXIDR3_RTR:     equ    0                                         ; Remote Transmission Request
+CAN1TXIDR3_ID0:     equ    1                                         ; Extended format identifier Bit 0
+CAN1TXIDR3_ID1:     equ    2                                         ; Extended format identifier Bit 1
+CAN1TXIDR3_ID2:     equ    3                                         ; Extended format identifier Bit 2
+CAN1TXIDR3_ID3:     equ    4                                         ; Extended format identifier Bit 3
+CAN1TXIDR3_ID4:     equ    5                                         ; Extended format identifier Bit 4
+CAN1TXIDR3_ID5:     equ    6                                         ; Extended format identifier Bit 5
+CAN1TXIDR3_ID6:     equ    7                                         ; Extended format identifier Bit 6
+; bit position masks
+mCAN1TXIDR3_RTR:    equ    %00000001
+mCAN1TXIDR3_ID0:    equ    %00000010
+mCAN1TXIDR3_ID1:    equ    %00000100
+mCAN1TXIDR3_ID2:    equ    %00001000
+mCAN1TXIDR3_ID3:    equ    %00010000
+mCAN1TXIDR3_ID4:    equ    %00100000
+mCAN1TXIDR3_ID5:    equ    %01000000
+mCAN1TXIDR3_ID6:    equ    %10000000
+
+
+;*** CAN1TXDSR0 - MSCAN 1 Transmit Data Segment Register 0; 0x000001B4 ***
+CAN1TXDSR0:         equ    $000001B4                                ;*** CAN1TXDSR0 - MSCAN 1 Transmit Data Segment Register 0; 0x000001B4 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1TXDSR0_DB0:     equ    0                                         ; Data Bit 0
+CAN1TXDSR0_DB1:     equ    1                                         ; Data Bit 1
+CAN1TXDSR0_DB2:     equ    2                                         ; Data Bit 2
+CAN1TXDSR0_DB3:     equ    3                                         ; Data Bit 3
+CAN1TXDSR0_DB4:     equ    4                                         ; Data Bit 4
+CAN1TXDSR0_DB5:     equ    5                                         ; Data Bit 5
+CAN1TXDSR0_DB6:     equ    6                                         ; Data Bit 6
+CAN1TXDSR0_DB7:     equ    7                                         ; Data Bit 7
+; bit position masks
+mCAN1TXDSR0_DB0:    equ    %00000001
+mCAN1TXDSR0_DB1:    equ    %00000010
+mCAN1TXDSR0_DB2:    equ    %00000100
+mCAN1TXDSR0_DB3:    equ    %00001000
+mCAN1TXDSR0_DB4:    equ    %00010000
+mCAN1TXDSR0_DB5:    equ    %00100000
+mCAN1TXDSR0_DB6:    equ    %01000000
+mCAN1TXDSR0_DB7:    equ    %10000000
+
+
+;*** CAN1TXDSR1 - MSCAN 1 Transmit Data Segment Register 1; 0x000001B5 ***
+CAN1TXDSR1:         equ    $000001B5                                ;*** CAN1TXDSR1 - MSCAN 1 Transmit Data Segment Register 1; 0x000001B5 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1TXDSR1_DB0:     equ    0                                         ; Data Bit 0
+CAN1TXDSR1_DB1:     equ    1                                         ; Data Bit 1
+CAN1TXDSR1_DB2:     equ    2                                         ; Data Bit 2
+CAN1TXDSR1_DB3:     equ    3                                         ; Data Bit 3
+CAN1TXDSR1_DB4:     equ    4                                         ; Data Bit 4
+CAN1TXDSR1_DB5:     equ    5                                         ; Data Bit 5
+CAN1TXDSR1_DB6:     equ    6                                         ; Data Bit 6
+CAN1TXDSR1_DB7:     equ    7                                         ; Data Bit 7
+; bit position masks
+mCAN1TXDSR1_DB0:    equ    %00000001
+mCAN1TXDSR1_DB1:    equ    %00000010
+mCAN1TXDSR1_DB2:    equ    %00000100
+mCAN1TXDSR1_DB3:    equ    %00001000
+mCAN1TXDSR1_DB4:    equ    %00010000
+mCAN1TXDSR1_DB5:    equ    %00100000
+mCAN1TXDSR1_DB6:    equ    %01000000
+mCAN1TXDSR1_DB7:    equ    %10000000
+
+
+;*** CAN1TXDSR2 - MSCAN 1 Transmit Data Segment Register 2; 0x000001B6 ***
+CAN1TXDSR2:         equ    $000001B6                                ;*** CAN1TXDSR2 - MSCAN 1 Transmit Data Segment Register 2; 0x000001B6 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1TXDSR2_DB0:     equ    0                                         ; Data Bit 0
+CAN1TXDSR2_DB1:     equ    1                                         ; Data Bit 1
+CAN1TXDSR2_DB2:     equ    2                                         ; Data Bit 2
+CAN1TXDSR2_DB3:     equ    3                                         ; Data Bit 3
+CAN1TXDSR2_DB4:     equ    4                                         ; Data Bit 4
+CAN1TXDSR2_DB5:     equ    5                                         ; Data Bit 5
+CAN1TXDSR2_DB6:     equ    6                                         ; Data Bit 6
+CAN1TXDSR2_DB7:     equ    7                                         ; Data Bit 7
+; bit position masks
+mCAN1TXDSR2_DB0:    equ    %00000001
+mCAN1TXDSR2_DB1:    equ    %00000010
+mCAN1TXDSR2_DB2:    equ    %00000100
+mCAN1TXDSR2_DB3:    equ    %00001000
+mCAN1TXDSR2_DB4:    equ    %00010000
+mCAN1TXDSR2_DB5:    equ    %00100000
+mCAN1TXDSR2_DB6:    equ    %01000000
+mCAN1TXDSR2_DB7:    equ    %10000000
+
+
+;*** CAN1TXDSR3 - MSCAN 1 Transmit Data Segment Register 3; 0x000001B7 ***
+CAN1TXDSR3:         equ    $000001B7                                ;*** CAN1TXDSR3 - MSCAN 1 Transmit Data Segment Register 3; 0x000001B7 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1TXDSR3_DB0:     equ    0                                         ; Data Bit 0
+CAN1TXDSR3_DB1:     equ    1                                         ; Data Bit 1
+CAN1TXDSR3_DB2:     equ    2                                         ; Data Bit 2
+CAN1TXDSR3_DB3:     equ    3                                         ; Data Bit 3
+CAN1TXDSR3_DB4:     equ    4                                         ; Data Bit 4
+CAN1TXDSR3_DB5:     equ    5                                         ; Data Bit 5
+CAN1TXDSR3_DB6:     equ    6                                         ; Data Bit 6
+CAN1TXDSR3_DB7:     equ    7                                         ; Data Bit 7
+; bit position masks
+mCAN1TXDSR3_DB0:    equ    %00000001
+mCAN1TXDSR3_DB1:    equ    %00000010
+mCAN1TXDSR3_DB2:    equ    %00000100
+mCAN1TXDSR3_DB3:    equ    %00001000
+mCAN1TXDSR3_DB4:    equ    %00010000
+mCAN1TXDSR3_DB5:    equ    %00100000
+mCAN1TXDSR3_DB6:    equ    %01000000
+mCAN1TXDSR3_DB7:    equ    %10000000
+
+
+;*** CAN1TXDSR4 - MSCAN 1 Transmit Data Segment Register 4; 0x000001B8 ***
+CAN1TXDSR4:         equ    $000001B8                                ;*** CAN1TXDSR4 - MSCAN 1 Transmit Data Segment Register 4; 0x000001B8 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1TXDSR4_DB0:     equ    0                                         ; Data Bit 0
+CAN1TXDSR4_DB1:     equ    1                                         ; Data Bit 1
+CAN1TXDSR4_DB2:     equ    2                                         ; Data Bit 2
+CAN1TXDSR4_DB3:     equ    3                                         ; Data Bit 3
+CAN1TXDSR4_DB4:     equ    4                                         ; Data Bit 4
+CAN1TXDSR4_DB5:     equ    5                                         ; Data Bit 5
+CAN1TXDSR4_DB6:     equ    6                                         ; Data Bit 6
+CAN1TXDSR4_DB7:     equ    7                                         ; Data Bit 7
+; bit position masks
+mCAN1TXDSR4_DB0:    equ    %00000001
+mCAN1TXDSR4_DB1:    equ    %00000010
+mCAN1TXDSR4_DB2:    equ    %00000100
+mCAN1TXDSR4_DB3:    equ    %00001000
+mCAN1TXDSR4_DB4:    equ    %00010000
+mCAN1TXDSR4_DB5:    equ    %00100000
+mCAN1TXDSR4_DB6:    equ    %01000000
+mCAN1TXDSR4_DB7:    equ    %10000000
+
+
+;*** CAN1TXDSR5 - MSCAN 1 Transmit Data Segment Register 5; 0x000001B9 ***
+CAN1TXDSR5:         equ    $000001B9                                ;*** CAN1TXDSR5 - MSCAN 1 Transmit Data Segment Register 5; 0x000001B9 ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1TXDSR5_DB0:     equ    0                                         ; Data Bit 0
+CAN1TXDSR5_DB1:     equ    1                                         ; Data Bit 1
+CAN1TXDSR5_DB2:     equ    2                                         ; Data Bit 2
+CAN1TXDSR5_DB3:     equ    3                                         ; Data Bit 3
+CAN1TXDSR5_DB4:     equ    4                                         ; Data Bit 4
+CAN1TXDSR5_DB5:     equ    5                                         ; Data Bit 5
+CAN1TXDSR5_DB6:     equ    6                                         ; Data Bit 6
+CAN1TXDSR5_DB7:     equ    7                                         ; Data Bit 7
+; bit position masks
+mCAN1TXDSR5_DB0:    equ    %00000001
+mCAN1TXDSR5_DB1:    equ    %00000010
+mCAN1TXDSR5_DB2:    equ    %00000100
+mCAN1TXDSR5_DB3:    equ    %00001000
+mCAN1TXDSR5_DB4:    equ    %00010000
+mCAN1TXDSR5_DB5:    equ    %00100000
+mCAN1TXDSR5_DB6:    equ    %01000000
+mCAN1TXDSR5_DB7:    equ    %10000000
+
+
+;*** CAN1TXDSR6 - MSCAN 1 Transmit Data Segment Register 6; 0x000001BA ***
+CAN1TXDSR6:         equ    $000001BA                                ;*** CAN1TXDSR6 - MSCAN 1 Transmit Data Segment Register 6; 0x000001BA ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1TXDSR6_DB0:     equ    0                                         ; Data Bit 0
+CAN1TXDSR6_DB1:     equ    1                                         ; Data Bit 1
+CAN1TXDSR6_DB2:     equ    2                                         ; Data Bit 2
+CAN1TXDSR6_DB3:     equ    3                                         ; Data Bit 3
+CAN1TXDSR6_DB4:     equ    4                                         ; Data Bit 4
+CAN1TXDSR6_DB5:     equ    5                                         ; Data Bit 5
+CAN1TXDSR6_DB6:     equ    6                                         ; Data Bit 6
+CAN1TXDSR6_DB7:     equ    7                                         ; Data Bit 7
+; bit position masks
+mCAN1TXDSR6_DB0:    equ    %00000001
+mCAN1TXDSR6_DB1:    equ    %00000010
+mCAN1TXDSR6_DB2:    equ    %00000100
+mCAN1TXDSR6_DB3:    equ    %00001000
+mCAN1TXDSR6_DB4:    equ    %00010000
+mCAN1TXDSR6_DB5:    equ    %00100000
+mCAN1TXDSR6_DB6:    equ    %01000000
+mCAN1TXDSR6_DB7:    equ    %10000000
+
+
+;*** CAN1TXDSR7 - MSCAN 1 Transmit Data Segment Register 7; 0x000001BB ***
+CAN1TXDSR7:         equ    $000001BB                                ;*** CAN1TXDSR7 - MSCAN 1 Transmit Data Segment Register 7; 0x000001BB ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1TXDSR7_DB0:     equ    0                                         ; Data Bit 0
+CAN1TXDSR7_DB1:     equ    1                                         ; Data Bit 1
+CAN1TXDSR7_DB2:     equ    2                                         ; Data Bit 2
+CAN1TXDSR7_DB3:     equ    3                                         ; Data Bit 3
+CAN1TXDSR7_DB4:     equ    4                                         ; Data Bit 4
+CAN1TXDSR7_DB5:     equ    5                                         ; Data Bit 5
+CAN1TXDSR7_DB6:     equ    6                                         ; Data Bit 6
+CAN1TXDSR7_DB7:     equ    7                                         ; Data Bit 7
+; bit position masks
+mCAN1TXDSR7_DB0:    equ    %00000001
+mCAN1TXDSR7_DB1:    equ    %00000010
+mCAN1TXDSR7_DB2:    equ    %00000100
+mCAN1TXDSR7_DB3:    equ    %00001000
+mCAN1TXDSR7_DB4:    equ    %00010000
+mCAN1TXDSR7_DB5:    equ    %00100000
+mCAN1TXDSR7_DB6:    equ    %01000000
+mCAN1TXDSR7_DB7:    equ    %10000000
+
+
+;*** CAN1TXDLR - MSCAN 1 Transmit Data Length Register; 0x000001BC ***
+CAN1TXDLR:          equ    $000001BC                                ;*** CAN1TXDLR - MSCAN 1 Transmit Data Length Register; 0x000001BC ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1TXDLR_DLC0:     equ    0                                         ; Data Length Code Bit 0
+CAN1TXDLR_DLC1:     equ    1                                         ; Data Length Code Bit 1
+CAN1TXDLR_DLC2:     equ    2                                         ; Data Length Code Bit 2
+CAN1TXDLR_DLC3:     equ    3                                         ; Data Length Code Bit 3
+; bit position masks
+mCAN1TXDLR_DLC0:    equ    %00000001
+mCAN1TXDLR_DLC1:    equ    %00000010
+mCAN1TXDLR_DLC2:    equ    %00000100
+mCAN1TXDLR_DLC3:    equ    %00001000
+
+
+;*** CAN1TXTBPR - MSCAN 1 Transmit Buffer Priority; 0x000001BD ***
+CAN1TXTBPR:         equ    $000001BD                                ;*** CAN1TXTBPR - MSCAN 1 Transmit Buffer Priority; 0x000001BD ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1TXTBPR_PRIO0:   equ    0                                         ; Transmit Buffer Priority Bit 0
+CAN1TXTBPR_PRIO1:   equ    1                                         ; Transmit Buffer Priority Bit 1
+CAN1TXTBPR_PRIO2:   equ    2                                         ; Transmit Buffer Priority Bit 2
+CAN1TXTBPR_PRIO3:   equ    3                                         ; Transmit Buffer Priority Bit 3
+CAN1TXTBPR_PRIO4:   equ    4                                         ; Transmit Buffer Priority Bit 4
+CAN1TXTBPR_PRIO5:   equ    5                                         ; Transmit Buffer Priority Bit 5
+CAN1TXTBPR_PRIO6:   equ    6                                         ; Transmit Buffer Priority Bit 6
+CAN1TXTBPR_PRIO7:   equ    7                                         ; Transmit Buffer Priority Bit 7
+; bit position masks
+mCAN1TXTBPR_PRIO0:  equ    %00000001
+mCAN1TXTBPR_PRIO1:  equ    %00000010
+mCAN1TXTBPR_PRIO2:  equ    %00000100
+mCAN1TXTBPR_PRIO3:  equ    %00001000
+mCAN1TXTBPR_PRIO4:  equ    %00010000
+mCAN1TXTBPR_PRIO5:  equ    %00100000
+mCAN1TXTBPR_PRIO6:  equ    %01000000
+mCAN1TXTBPR_PRIO7:  equ    %10000000
+
+
+;*** CAN1TXTSR - MSCAN 1 Transmit Time Stamp Register; 0x000001BE ***
+CAN1TXTSR:          equ    $000001BE                                ;*** CAN1TXTSR - MSCAN 1 Transmit Time Stamp Register; 0x000001BE ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1TXTSR_TSR0:     equ    0                                         ; Time Stamp Bit 0
+CAN1TXTSR_TSR1:     equ    1                                         ; Time Stamp Bit 1
+CAN1TXTSR_TSR2:     equ    2                                         ; Time Stamp Bit 2
+CAN1TXTSR_TSR3:     equ    3                                         ; Time Stamp Bit 3
+CAN1TXTSR_TSR4:     equ    4                                         ; Time Stamp Bit 4
+CAN1TXTSR_TSR5:     equ    5                                         ; Time Stamp Bit 5
+CAN1TXTSR_TSR6:     equ    6                                         ; Time Stamp Bit 6
+CAN1TXTSR_TSR7:     equ    7                                         ; Time Stamp Bit 7
+CAN1TXTSR_TSR8:     equ    8                                         ; Time Stamp Bit 8
+CAN1TXTSR_TSR9:     equ    9                                         ; Time Stamp Bit 9
+CAN1TXTSR_TSR10:    equ    10                                        ; Time Stamp Bit 10
+CAN1TXTSR_TSR11:    equ    11                                        ; Time Stamp Bit 11
+CAN1TXTSR_TSR12:    equ    12                                        ; Time Stamp Bit 12
+CAN1TXTSR_TSR13:    equ    13                                        ; Time Stamp Bit 13
+CAN1TXTSR_TSR14:    equ    14                                        ; Time Stamp Bit 14
+CAN1TXTSR_TSR15:    equ    15                                        ; Time Stamp Bit 15
+; bit position masks
+mCAN1TXTSR_TSR0:    equ    %00000001
+mCAN1TXTSR_TSR1:    equ    %00000010
+mCAN1TXTSR_TSR2:    equ    %00000100
+mCAN1TXTSR_TSR3:    equ    %00001000
+mCAN1TXTSR_TSR4:    equ    %00010000
+mCAN1TXTSR_TSR5:    equ    %00100000
+mCAN1TXTSR_TSR6:    equ    %01000000
+mCAN1TXTSR_TSR7:    equ    %10000000
+mCAN1TXTSR_TSR8:    equ    %100000000
+mCAN1TXTSR_TSR9:    equ    %1000000000
+mCAN1TXTSR_TSR10:   equ    %10000000000
+mCAN1TXTSR_TSR11:   equ    %100000000000
+mCAN1TXTSR_TSR12:   equ    %1000000000000
+mCAN1TXTSR_TSR13:   equ    %10000000000000
+mCAN1TXTSR_TSR14:   equ    %100000000000000
+mCAN1TXTSR_TSR15:   equ    %1000000000000000
+
+
+;*** CAN1TXTSRH - MSCAN 1 Transmit Time Stamp Register High; 0x000001BE ***
+CAN1TXTSRH:         equ    $000001BE                                ;*** CAN1TXTSRH - MSCAN 1 Transmit Time Stamp Register High; 0x000001BE ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1TXTSRH_TSR8:    equ    0                                         ; Time Stamp Bit 8
+CAN1TXTSRH_TSR9:    equ    1                                         ; Time Stamp Bit 9
+CAN1TXTSRH_TSR10:   equ    2                                         ; Time Stamp Bit 10
+CAN1TXTSRH_TSR11:   equ    3                                         ; Time Stamp Bit 11
+CAN1TXTSRH_TSR12:   equ    4                                         ; Time Stamp Bit 12
+CAN1TXTSRH_TSR13:   equ    5                                         ; Time Stamp Bit 13
+CAN1TXTSRH_TSR14:   equ    6                                         ; Time Stamp Bit 14
+CAN1TXTSRH_TSR15:   equ    7                                         ; Time Stamp Bit 15
+; bit position masks
+mCAN1TXTSRH_TSR8:   equ    %00000001
+mCAN1TXTSRH_TSR9:   equ    %00000010
+mCAN1TXTSRH_TSR10:  equ    %00000100
+mCAN1TXTSRH_TSR11:  equ    %00001000
+mCAN1TXTSRH_TSR12:  equ    %00010000
+mCAN1TXTSRH_TSR13:  equ    %00100000
+mCAN1TXTSRH_TSR14:  equ    %01000000
+mCAN1TXTSRH_TSR15:  equ    %10000000
+
+
+;*** CAN1TXTSRL - MSCAN 1 Transmit Time Stamp Register Low; 0x000001BF ***
+CAN1TXTSRL:         equ    $000001BF                                ;*** CAN1TXTSRL - MSCAN 1 Transmit Time Stamp Register Low; 0x000001BF ***
+; bit numbers for usage in BCLR, BSET, BRCLR and BRSET
+CAN1TXTSRL_TSR0:    equ    0                                         ; Time Stamp Bit 0
+CAN1TXTSRL_TSR1:    equ    1                                         ; Time Stamp Bit 1
+CAN1TXTSRL_TSR2:    equ    2                                         ; Time Stamp Bit 2
+CAN1TXTSRL_TSR3:    equ    3                                         ; Time Stamp Bit 3
+CAN1TXTSRL_TSR4:    equ    4                                         ; Time Stamp Bit 4
+CAN1TXTSRL_TSR5:    equ    5                                         ; Time Stamp Bit 5
+CAN1TXTSRL_TSR6:    equ    6                                         ; Time Stamp Bit 6
+CAN1TXTSRL_TSR7:    equ    7                                         ; Time Stamp Bit 7
+; bit position masks
+mCAN1TXTSRL_TSR0:   equ    %00000001
+mCAN1TXTSRL_TSR1:   equ    %00000010
+mCAN1TXTSRL_TSR2:   equ    %00000100
+mCAN1TXTSRL_TSR3:   equ    %00001000
+mCAN1TXTSRL_TSR4:   equ    %00010000
+mCAN1TXTSRL_TSR5:   equ    %00100000
+mCAN1TXTSRL_TSR6:   equ    %01000000
+mCAN1TXTSRL_TSR7:   equ    %10000000
 
 
 ;*** PTT - Port T I/O Register; 0x00000240 ***
@@ -8656,8 +10000,8 @@ NVFSEC_NV2:         equ    2                                         ; Non Volat
 NVFSEC_NV3:         equ    3                                         ; Non Volatile flag bit 3
 NVFSEC_NV4:         equ    4                                         ; Non Volatile flag bit 4
 NVFSEC_NV5:         equ    5                                         ; Non Volatile flag bit 5
-NVFSEC_KEYEN0:      equ    6                                         ; Backdoor Key Security Enable Bit 0
-NVFSEC_KEYEN1:      equ    7                                         ; Backdoor Key Security Enable Bit 1
+NVFSEC_NV6:         equ    6                                         ; Non Volatile flag bit 6
+NVFSEC_KEYEN:       equ    7                                         ; Backdoor Key Security Enable
 ; bit position masks
 mNVFSEC_SEC0:       equ    %00000001
 mNVFSEC_SEC1:       equ    %00000010
@@ -8665,8 +10009,8 @@ mNVFSEC_NV2:        equ    %00000100
 mNVFSEC_NV3:        equ    %00001000
 mNVFSEC_NV4:        equ    %00010000
 mNVFSEC_NV5:        equ    %00100000
-mNVFSEC_KEYEN0:     equ    %01000000
-mNVFSEC_KEYEN1:     equ    %10000000
+mNVFSEC_NV6:        equ    %01000000
+mNVFSEC_KEYEN:      equ    %10000000
 
 
 
@@ -8688,25 +10032,32 @@ ROMStart    EQU  $4000  ; absolute address to place my code/constant data
 
 ; variable/data section
 
- ifdef _HCS12_SERIALMON
-            ORG $3FFF - (RAMEnd - RAMStart)
- else
- endif
- ; Insert here your data definition.
-Counter     DS.W 1
-FiboRes     DS.W 1
+            ORG RAMStart
+; Insert here your data definition.
 
-;---Reserved memory for input strings---
-NUL EQU $0
-LF EQU $A
-CR EQU $D
-SPC EQU $20
+string_length    DS.B  1     ; one byte to store the string length
+
+fullstop_count   DS.B  1     ; one byte to store the string length
+
+test_count       DS.B  1     ; one byte to store the count of the test_character
+
+current_count    DS.B  1     ; one byte to store the count of the test_character
+
+spc_count        DS.B  1     ; one byte to store the count of the test_character
+
+input_string     FCC   "this IS a String. a. B" ; make a string in memory
+                 FCB  $00
+output_string1   DS.B  48     ; allocate 256 bytes at the address output_string
+                 FCB  $00
+output_string2   DS.B  48     ; allocate 256 bytes at the address output_string
+                 FCB  $00
+output_string3   DS.B  48     ; allocate 256 bytes at the address output_string
+                 FCB  $00
+output_string4   DS.B  48     ; allocate 256 bytes at the address output_string
+                 FCB  $00
 
 
-TASKFLAG FCB 0
-SPACEFLAG FCB 0
-READ RMB 80
-WRITE RMB 80
+
 
 ; code section
             ORG   ROMStart
@@ -8714,156 +10065,227 @@ WRITE RMB 80
 
 Entry:
 _Startup:
-            ; remap the RAM &amp; EEPROM here. See EB386.pdf
- ifdef _HCS12_SERIALMON
-            ; set registers at $0000
-            CLR   $11                  ; INITRG= $0
-            ; set ram to end at $3FFF
-            LDAB  #$39
-            STAB  $10                  ; INITRM= $39
-
-            ; set eeprom to end at $0FFF
-            LDAA  #$9
-            STAA  $12                  ; INITEE= $9
-
-
-            LDS   #$3FFF+1        ; See EB386.pdf, initialize the stack pointer
- else
- endif
+            LDS   #RAMEnd+1       ; initialize the stack pointer
 
             CLI                     ; enable interrupts
+mainLoop:
+            LDAA  #0
+            STAA  test_count      ;to show current task
+
+            LDAA  #0
+            STAA  current_count   ;to count the number of array in the string
+            
+            LDAA  #1
+            STAA  spc_count       ;to detect spaces
+            
+            LDAA  #0
+            STAA  fullstop_count  ;to detect fullstop
+                                    
+            LDAA  #0              
+            STAA  string_length   ;store the input string length
+            
+            
+                                                  
+            LDX   #input_string   ;load input string into x
 
 
+;find the length of the string          
+  find_length:    
+            LDAB  1, x+
+            INC   string_length
+            CMPB  $00
+            BEQ   loop
+            BRA   find_length
 
-mainLoop: 
-  
-  MOVB #156, SCI1BDL                  ; set baud rate to 9600
-  LDX #READ                      ; loads word address into X register
-                         
-  bsr readSCI1                      ; read string from serial data register
-    
+;start by case 1, making the string in lower cases
+loop:           
+            BRA   string1
 
-send_str:
-    LDAA 1,X+                         ; loads value at X into accumulator A & increment
-    BEQ mainLoop                      ; delay when null character is found (end of string)
-    
-    bsr loadSCI1                      ; load character to serial 1 data register
-    bra send_str                      ; return to beginning of subroutine
+;printing the other task cases            
+loop2:
+            
+            LDAA  #0              ;reset count so it can be used by the other task
+            STAA  current_count
+            INC   test_count      ;add one after each task complete so to get to the next one
+            LDAA  test_count
+            CMPA  #1
+            BEQ   string2
+            CMPA  #2
+            BEQ   string3
+            CMPA  #3
+            BEQ   string4
+            CMPA  #4
+            BEQ   mainLoop
+            
+            
+            
+;lower cases for all letters            
+  string1:  
+            LDX   #input_string        ;load input string to x
+            LDY   #output_string1      ;store the changes in output string1
+            BRA   find_char
+            
+    all_lower: 
+                CMPB  #$61             ;check if it's lower case. The first lower case is 'a'
+                                       ;starts with 61
+                LBLT   make_lower      ;else make it lower case              
+                LBRA   skipUpdate      ;dont update if it is in lower case
 
+                
 
-; -- Loads Character in A register to Serial 1 Data Register --
-loadSCI1:                
-    MOVB #mSCI1CR2_TE, SCI1CR2        ; set control register to transmit data
-    brclr SCI1SR1,mSCI1SR1_TDRE,*     ; waits for TDRE to be set
-    staa SCI1DRL                      ; loads character from A register to data register
-    rts
-    
-    
-; -- Read incoming characters from Serial 1 Data Register, loop until return character encountered -- 
-readSCI1:                 
-    MOVB #mSCI1CR2_RE, SCI1CR2        ; set control register to receive data
-    brclr SCI1SR1, mSCI1SR1_RDRF,*    ; poll RDRF register
-    LDAA SCI1DRL                      ; load value from data register to A register
-    STAA 1,X+                         ; store value from A to X index 
-    CMPA #CR                          ; check if character in A register is the return character
-    BEQ complete_string               ; branch to complete_string subroutine if return character encountered
-    bra readSCI1                      ; otherwise, continue looping
+;upper cases for all letters                
+ string2:
+            LDX   #input_string        ;load input string to x
+            LDY   #output_string2      ;store the changes in output string1
+            BRA   find_char           
+            
+    all_upper: 
+                CMPB  #$61             ;check if it's lower case. The first lower case is 'a'
+                                       ;starts with 61             
+                LBGE   make_upper       ;update if it is in lower case
+                LBRA   skipUpdate       ;dont update if it is in upper case                
 
-; -- Adds carriage return and null character to end of string at address pointed by X index --
-complete_string:
-    LDAA #LF                          ; load carriage return character to A register
-    STAA 1,X+                         ; store byte in A register to address pointed by X index
-    LDAA #NUL                         ; load null character to A register
-    STAA 1,X+                         ; store byte in A register to address pointed by X index
-    LDX #READ                         ; return X index to beginning of string
-    bra task_number                   ; send string to serial interface
-
-; Subroutine takes approx 1 second to complete using nested loops, returns to beginning of code after execution 
-delay_reset:   
-  LDX #60000                          ; load 60000 into X  
-  LOOP1:
-    LDY #100                          ; load 100 into Y
-    LOOP2:
-      DBNE Y, LOOP2                   ; decrement Y, branch to LOOP2 if not 0
-    DBNE X, LOOP1                     ; decremeny X, branch to LOOP1 if not 0
-               
-  bra mainLoop
-
-
-task_number:                          
-  MOVB #$0,DDRH                       ; set port H data direction register to input
-  LDAB PTH                            ; store value of port H in B register
-  LDX #TASKFLAG
-  STAB 0,X
-  LDX #READ
-  LDY #WRITE
-  LDAB 0
-  
-change_str:                           ; subroutine for altering the input string
-  
-  LDAA TASKFLAG                       
-  
-  CMPA #$1                            ; comparing task flag with 1 to determine string alteration type
-  BEQ space_upper_loop
-  BNE all_upper_loop
-  
-  all_upper_loop:
-      LDAA 1,X+                       ; load value at X into A register and increment
-      CMPA #CR                        ; check if carriage return character
-      BEQ finish
-      CMPA #$61                       ; check case of character in A
-      BGE make_upper                  ; make it upper case if it's lower
-      BLO next
-  
-  space_upper_loop:                   ; load value at X into A register and increment
-      LDAA 1,X+
-      CMPA #CR
-      BEQ finish
-      CMPA #SPC
-      BEQ space
-      CMPB #$0
-      BEQ before_space
-      BNE after_space   
-  
-  before_space:    
-      CMPA #$61
-      BLO make_lower
-      BGE next
-  
-  after_space:
-      LDAB #0
-      CMPA #$61
-      BGE make_upper
-      BLO next
- 
-  space:
-      LDAB #1                         ; load 1 into B to flag previous character was a space
-      bra next
-      
-  next:  
-    STAA  1,Y+                        ;store into output
-    bra change_str
-  
-  make_upper:
-    SUBA  #$20                        ;lower case is 32 characters above it's corresponding uppercase                         
-    bra next  
-  
-  make_lower:
-    ADDA #$20                         ;upper case is 32 characters below it's corresponding lowercase
-    bra next
-  
-  finish:
-    STAA  1,Y+
-    LDAA #$A                          ; load carriage return character to A register
-    STAA 1,Y+                         ; store byte in A register to address pointed by X index
-    LDAA #00                          ; load null character to A register
-    STAA 1,Y+                         ; store byte in A register to address pointed by X index
-    LDX #WRITE
-    LBRA send_str    
-    
-    
-    
+;Capitalise the first letter of each word
+string3:
+            LDX   #input_string 
+            LDY   #output_string3
+            BRA   find_char 
+            
                     
+    Cap_first:    
+            DEC   spc_count             ;initialise count
+            CMPB  #$61                  ;check if it's lower case. The first lower case is 'a'
+            LBGE   make_upper           ;update if it is in lower case
+            LBRA   skipUpdate           ;dont update if it is in upper case                  
+
+
+;Capitalise the first letter of the string and after a fullstop            
+string4:
+            LDX   #input_string 
+            LDY   #output_string4
+            BRA   find_char                 
+                    
+    Cap_fullstop:
+            DEC   spc_count             ;initialise count
+            DEC   fullstop_count        ;initialise count
+            CMPB  #$61                  ;check if it's lower case. The first lower case is 'a'
+            LBGE   make_upper           ;update if it is in lower case
+            LBRA   skipUpdate           ;dont update if it is in upper case                                  
+                               
+;determine if it is a letter
+find_char:  
+            INC   current_count         ;count the current location of the string  
+            LDAA  current_count
+            CMPA  string_length         ;if it is at the end of the string, start the next task
+            BEQ   loop2
+           
+            LDAB  1, x+
+            
+            LDAA  test_count            
+            
+            CMPA  #02
+            BEQ   case3
+            
+            CMPA  #03
+            BEQ   case4
+            
+            BRA   find_char1
+            
+case3: 
+            LDAA  current_count     ;load current state and if is the first letter,
+            CMPA  #01               ;capitalise it
+            BEQ   Cap_first         
+            
+            LDAA  spc_count         ;if the letter is after a space, capitalise it
+            CMPA  #00
+            BGT   Cap_first
+            BRA   next
+           
+  next:            
+            CMPB  #$20              ;determine if it is a space
+            BEQ   flag_spc          
+            
+            LDAA  test_count        ;for the forth task, capitalise after a fullstop 
+            CMPA  #03               ;and a space
+            BEQ   Cap_fullstop      ;if full stop and space flags are both present, capitalise it
+            BRA   find_char1
+  flag_spc:   
+            INC   spc_count         ;add one to indecate that space has being found
+            LDAA  spc_count
+            CMPA  #00
+            BGT   skip
+
+case4:
+            LDAA  current_count     ;load current state and if is the first letter,
+            CMPA  #01               ;capitalise it
+            BEQ   Cap_first 
+            
+            LDAA  fullstop_count    ;determine if there is a fullstop being detected before
+            CMPA  #00
+            BGT   next              ;check if there is space detected
+            BRA   next1             
+
+  next1:            
+            CMPB  #$2E              ;check if it is a fullstop
+            BEQ   flag_fullstop     ;add one if it is
+            BRA   find_char1        ;print it out
+
+  flag_fullstop:
+            INC   fullstop_count
+            LDAA  fullstop_count
+            CMPA  #00
+            BGT   skip          
+                       
+;determine if it is a letter               
+find_char1:            
+            CMPB  #$41              ;from scii chart, first letter A starts with 41
+            BGE   distribute        ;knowning that it is a letter, determine if it is 
+                                    ;upper or lower case.
+
+skip:
+            BRA   skipUpdate       ;if it is not a letter, dont change
+
+            
+distribute:          
+            LDAA  test_count 
+            CMPA  #00
+            LBEQ   all_lower      ;make lower case
+            CMPA  #01
+            LBEQ   all_upper      ;make upper case
+            CMPA  #02
+            LBEQ   all_lower      ;make lower case      
+            CMPA  #03
+            LBEQ   all_lower      ;else make it lower case
+      
+
+;making letters to lower casing   
+make_lower: 
+            ADDB  #$20              ;upper case is 20 apart from it's corresponding
+                                    ;lower case 
+            STAB  0,y               ;store into output
+            INY
+            DECA
+            LBNE find_char 
+
+
+;making letters to upper casing
+make_upper:
+            SUBB  #$20              ;lower case is 20 apart from it's corresponding
+                                    ;uper case 
+            STAB  0,y               ;store into output
+            INY
+            LBNE find_char 
+            
+
+
+;skip any update and just print it out
+skipUpdate:                                    
+            STAB  0,y
+            INY
+            LBNE find_char   
+
+        
+            
 
 ;**************************************************************
 ;*                 Interrupt Vectors                          *

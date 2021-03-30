@@ -31,15 +31,16 @@ Counter     DS.W 1
 FiboRes     DS.W 1
 
 ;---Reserved memory for input strings---
-NUL EQU $0
-LF EQU $A
-CR EQU $D
+NUL EQU $0                            ; null character
+LF EQU $A                             ; line feed character
+CR EQU $D                             ; carriage return character
+SPC EQU $20                           ; space character
 
-
-TASKFLAG FCB 0
-SPACEFLAG FCB 0
-READ RMB 80
-WRITE RMB 80
+                                      
+TASKFLAG FCB 0                        ; task flag, used to determine desired function
+SPACEFLAG FCB 0                       ; space flag, used to flag that previous character was a space
+READ RMB 80                           ; memory for storing received serial data
+WRITE RMB 80                          ; memory for storing transformed and ready to transmit data
 
 ; code section
             ORG   ROMStart
@@ -72,9 +73,9 @@ _Startup:
 mainLoop: 
   
   MOVB #156, SCI1BDL                  ; set baud rate to 9600
-  LDX #READ                      ; loads word address into X register
+  LDX #READ                           ; loads word address into X register
                          
-  bsr readSCI1                      ; read string from serial data register
+  bsr readSCI1                        ; read string from serial data register
     
 
 send_str:
@@ -133,45 +134,45 @@ task_number:
   LDY #WRITE
   LDAB 0
   
-change_str:
+change_str:                           ; subroutine for altering the input string
   
-  LDAA TASKFLAG
+  LDAA TASKFLAG                       
   
-  CMPA #$1
+  CMPA #$1                            ; comparing task flag with 1 to determine string alteration type
   BEQ space_upper_loop
   BNE all_upper_loop
   
   all_upper_loop:
-      LDAA 1,X+
-      CMPA #$0D
+      LDAA 1,X+                       ; load value at X into A register and increment
+      CMPA #CR                        ; check if carriage return character
       BEQ finish
-      CMPA #$61
-      BGE make_upper
+      CMPA #$61                       ; check case of character in A
+      BGE make_upper                  ; make it upper case if it's lower
       BLO next
   
-  space_upper_loop:
-      LDAA 1,X+
-      CMPA #$0D
+  space_upper_loop:                    
+      LDAA 1,X+                       ; load value at X into A register and increment
+      CMPA #CR                        ; check if carriage return character
       BEQ finish
-      CMPA #$20
+      CMPA #SPC                       ; comparte A value with space character
       BEQ space
-      CMPB #$0
+      CMPB #$0                        ; check if previous character was a space
       BEQ before_space
       BNE after_space   
   
   before_space:    
-      CMPA #$61
+      CMPA #$61                       ; makes all characters before/not directly after a space lower case
       BLO make_lower
       BGE next
   
   after_space:
-      LDAB #0
+      LDAB #0                         ; makes character immediately following a space upper case
       CMPA #$61
       BGE make_upper
       BLO next
  
   space:
-      LDAB #1
+      LDAB #1                         ; load 1 into B to flag previous character was a space
       bra next
       
   next:  
